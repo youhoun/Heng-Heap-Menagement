@@ -135,6 +135,7 @@ input,select,textarea{display:block;width:100%;margin-top:3px;font:inherit;color
     <label><span data-i18n="notes"></span><textarea id="no" rows="2"></textarea></label>
     <div class="est" id="est"></div>
     <div class="actions">
+      <button type="button" class="btn ghost" id="delRm" data-i18n="delRoom" style="margin-right:auto;color:#c0392b"></button>
       <button type="button" class="btn ghost" id="cx" data-i18n="cancel"></button>
       <button type="submit" class="btn" data-i18n="save"></button>
     </div>
@@ -142,7 +143,7 @@ input,select,textarea{display:block;width:100%;margin-top:3px;font:inherit;color
 </dialog>
 <dialog id="hdlg" class="wide">
   <div class="dh"><h2 data-i18n="histT"></h2><button type="button" class="x" id="hx">✕</button></div>
-  <div class="db"><div class="filters" id="htabs"></div><div id="hbody"></div></div>
+  <div class="db"><div class="filters" id="htabs"></div><div id="hbody"></div><div style="margin-top:12px;text-align:right"><button type="button" class="btn ghost sm" id="clrH" style="color:#c0392b" data-i18n="clearHist"></button></div></div>
 </dialog>
 <dialog id="lock">
   <div class="dh"><h2 data-i18n="codeT"></h2></div>
@@ -156,7 +157,7 @@ input,select,textarea{display:block;width:100%;margin-top:3px;font:inherit;color
 <div id="toast" role="status"></div>
 
 <script>
-const L={km:{codeT:"បញ្ចូលកូដចូលប្រើ",codeH:"កូដនេះរក្សាទិន្នន័យរបស់ HENG HEAP។ បុគ្គលិកទាំងអស់ប្រើកូដតែមួយ ទើបឃើញទិន្នន័យដូចគ្នា។ កុំប្រាប់កូដនេះទៅអ្នកផ្សេង។",codeL:"កូដចូលប្រើ (យ៉ាងតិច 8 តួ អក្សរ a-z ឬលេខ)",codeGo:"ចូល",codeBad:"កូដត្រូវមានយ៉ាងតិច 8 តួ (a-z ឬ 0-9)",codeChg:"ប្តូរកូដ",netOn:"ទិន្នន័យចែករំលែក (អនឡាញ)",netErr:"មិនអាចតភ្ជាប់មូលដ្ឋានទិន្នន័យ",netLocal:"មិនទាន់តភ្ជាប់មូលដ្ឋានទិន្នន័យ ទិន្នន័យនៅលើឧបករណ៍នេះប៉ុណ្ណោះ",netWait:"កំពុងតភ្ជាប់…",hist:"ប្រវត្តិ",histT:"ប្រវត្តិភ្ញៀវ",byDay:"តាមថ្ងៃ",stays:"ការស្នាក់ទាំងអស់",outNow:"ចាកចេញឥឡូវនេះ",close:"បិទ",recorded:"បានកត់ត្រា",noHist:"មិនទាន់មានប្រវត្តិទេ។ ប្រវត្តិនឹងបង្ហាញនៅពេលមានភ្ញៀវចូលស្នាក់។",hInR:"ចូលស្នាក់ (បន្ទប់)",hInP:"ចូលស្នាក់ (នាក់)",hInT:"ម៉ោងចូលស្នាក់",hOutT:"ម៉ោងចាកចេញ",title:"ផ្ទះសំណាក់ HENG HEAP",add:"បន្ថែមបន្ទប់",export:"នាំចេញជា Excel",prices:"តម្លៃក្នុងមួយយប់ ($)",b2:"គ្រែ 2",b1:"គ្រែ 1",ac:"ម៉ាស៊ីនត្រជាក់",fan:"កង្ហារ",all:"ទាំងអស់",
+const L={km:{codeT:"បញ្ចូលកូដចូលប្រើ",codeH:"កូដនេះរក្សាទិន្នន័យរបស់ HENG HEAP។ បុគ្គលិកទាំងអស់ប្រើកូដតែមួយ ទើបឃើញទិន្នន័យដូចគ្នា។ កុំប្រាប់កូដនេះទៅអ្នកផ្សេង។",codeL:"កូដចូលប្រើ (យ៉ាងតិច 8 តួ អក្សរ a-z ឬលេខ)",codeGo:"ចូល",codeBad:"កូដត្រូវមានយ៉ាងតិច 8 តួ (a-z ឬ 0-9)",codeChg:"ប្តូរកូដ",netOn:"ទិន្នន័យចែករំលែក (អនឡាញ)",netErr:"មិនអាចតភ្ជាប់មូលដ្ឋានទិន្នន័យ",netLocal:"មិនទាន់តភ្ជាប់មូលដ្ឋានទិន្នន័យ ទិន្នន័យនៅលើឧបករណ៍នេះប៉ុណ្ណោះ",netWait:"កំពុងតភ្ជាប់…",hist:"ប្រវត្តិ",clearHist:"លុបប្រវត្តិទាំងអស់",confirmClear:"លុបប្រវត្តិទាំងអស់? មិនអាចយកមកវិញបានទេ។ សូមនាំចេញជា Excel មុនសិន។",delFail:"មិនអាចលុបបានទេ។ សូមដំណើរការ SQL ថ្មីក្នុងឯកសារ heng-heap-setup.sql នៅ Supabase។",histT:"ប្រវត្តិភ្ញៀវ",byDay:"តាមថ្ងៃ",stays:"ការស្នាក់ទាំងអស់",outNow:"ចាកចេញឥឡូវនេះ",close:"បិទ",recorded:"បានកត់ត្រា",noHist:"មិនទាន់មានប្រវត្តិទេ។ ប្រវត្តិនឹងបង្ហាញនៅពេលមានភ្ញៀវចូលស្នាក់។",hInR:"ចូលស្នាក់ (បន្ទប់)",hInP:"ចូលស្នាក់ (នាក់)",hInT:"ម៉ោងចូលស្នាក់",hOutT:"ម៉ោងចាកចេញ",title:"ផ្ទះសំណាក់ HENG HEAP",add:"បន្ថែមបន្ទប់",export:"នាំចេញជា Excel",prices:"តម្លៃក្នុងមួយយប់ ($)",b2:"គ្រែ 2",b1:"គ្រែ 1",ac:"ម៉ាស៊ីនត្រជាក់",fan:"កង្ហារ",all:"ទាំងអស់",
 st_available:"ទំនេរ",st_occupied:"មានភ្ញៀវ",st_cleaning:"ត្រូវសម្អាត",st_maintenance:"កំពុងជួសជុល",dbl:"បន្ទប់គ្រែ 2",sgl:"បន្ទប់គ្រែ 1",room:"បន្ទប់លេខ",roomNo:"លេខបន្ទប់",beds:"ចំនួនគ្រែ",
 cool:"ម៉ាស៊ីនត្រជាក់ ឬកង្ហារ",status:"ស្ថានភាព",capL:"ចំណុះអតិបរមា (នាក់)",peopleL:"ចំនួនភ្ញៀវ (នាក់)",guest:"ឈ្មោះភ្ញៀវ",cin:"ចូលស្នាក់",cout:"ចាកចេញ",cinNow:"ចូលស្នាក់ឥឡូវនេះ",
 cinD:"ថ្ងៃចូលស្នាក់",cinT:"ម៉ោងចូលស្នាក់",coD:"ថ្ងៃចាកចេញ",coT:"ម៉ោងចាកចេញ",markReady:"សម្អាតរួច",edit:"កែប្រែ",del:"លុប",delRoom:"លុបបន្ទប់",save:"រក្សាទុក",cancel:"បោះបង់",notes:"កំណត់ចំណាំ",
@@ -165,7 +166,7 @@ empty:"មិនមានបន្ទប់ទេ។ ជ្រើសរើសត
 noXlsx:"មិនអាចផ្ទុកឧបករណ៍ Excel បានទេ។ សូមពិនិត្យអ៊ីនធឺណិត ហើយផ្ទុកទំព័រឡើងវិញ។",noSave:"មិនអាចរក្សាទុកឯកសារក្នុងទិដ្ឋភាពនេះទេ។ សូមបើកក្នុង claude.ai។",saveFail:"មិនអាចរក្សាទុកឯកសារបានទេ។",
 hRoom:"បន្ទប់",hBeds:"គ្រែ",hGuest:"ភ្ញៀវ",hPeople:"ចំនួនអ្នកស្នាក់ (នាក់)",hNights:"ចំនួនយប់",hStatus:"ស្ថានភាព",inHouse:"កំពុងស្នាក់",out:"ចាកចេញរួច",hDate:"កាលបរិច្ឆេទ",hRoomsOcc:"ចំនួនបន្ទប់មានភ្ញៀវ",
 hMonth:"ខែ",hCheckins:"ចំនួនដងចូលស្នាក់",hPeopleCI:"ភ្ញៀវចូលស្នាក់ (នាក់)",hRoomNights:"បន្ទប់-យប់សរុប",hAvg:"បន្ទប់ជាមធ្យមក្នុងមួយថ្ងៃ",shG:"ភ្ញៀវចូល-ចេញ",shD:"ក្នុងមួយថ្ងៃ",shM:"ក្នុងមួយខែ"},
-en:{codeT:"Enter access code",codeH:"This code keeps HENG HEAP data private. All staff use the same code to see the same data. Do not share it with anyone else.",codeL:"Access code (at least 8 letters a-z or numbers)",codeGo:"Enter",codeBad:"The code needs at least 8 characters (a-z or 0-9)",codeChg:"Change code",netOn:"Shared data (online)",netErr:"Cannot reach the database",netLocal:"Database not connected. Data stays on this device only.",netWait:"Connecting…",hist:"History",histT:"Guest history",byDay:"By day",stays:"All stays",outNow:"Check out now",close:"Close",recorded:"Recorded",noHist:"No history yet. It appears once guests check in.",hInR:"Check-ins (rooms)",hInP:"Check-ins (people)",hInT:"Check-in times",hOutT:"Check-out times",title:"HENG HEAP Guest House",add:"Add room",export:"Export to Excel",prices:"Prices per night ($)",b2:"2 beds",b1:"1 bed",ac:"AC",fan:"Fan",all:"All",
+en:{codeT:"Enter access code",codeH:"This code keeps HENG HEAP data private. All staff use the same code to see the same data. Do not share it with anyone else.",codeL:"Access code (at least 8 letters a-z or numbers)",codeGo:"Enter",codeBad:"The code needs at least 8 characters (a-z or 0-9)",codeChg:"Change code",netOn:"Shared data (online)",netErr:"Cannot reach the database",netLocal:"Database not connected. Data stays on this device only.",netWait:"Connecting…",hist:"History",clearHist:"Clear all history",confirmClear:"Clear ALL history? This cannot be undone. Export to Excel first if you need a copy.",delFail:"Could not delete. Run the new SQL in heng-heap-setup.sql in Supabase.",histT:"Guest history",byDay:"By day",stays:"All stays",outNow:"Check out now",close:"Close",recorded:"Recorded",noHist:"No history yet. It appears once guests check in.",hInR:"Check-ins (rooms)",hInP:"Check-ins (people)",hInT:"Check-in times",hOutT:"Check-out times",title:"HENG HEAP Guest House",add:"Add room",export:"Export to Excel",prices:"Prices per night ($)",b2:"2 beds",b1:"1 bed",ac:"AC",fan:"Fan",all:"All",
 st_available:"Available",st_occupied:"Occupied",st_cleaning:"Needs cleaning",st_maintenance:"Maintenance",dbl:"Double rooms (2 beds)",sgl:"Single rooms (1 bed)",room:"Room",roomNo:"Room number",beds:"Beds",
 cool:"AC or fan",status:"Status",capL:"Max people",peopleL:"Guests staying",guest:"Guest name",cin:"Check in",cout:"Check out",cinNow:"Check in now",
 cinD:"Check-in date",cinT:"Check-in time",coD:"Check-out date",coT:"Check-out time",markReady:"Mark clean",edit:"Edit",del:"Delete",delRoom:"Delete room",save:"Save room",cancel:"Cancel",notes:"Notes",
@@ -272,7 +273,7 @@ function openDlg(id,inNow){
   if(inNow)Object.assign(r,{status:"occupied",ci:ymd(now),cit:hm(now),people:r.people||1});
   $("dt").textContent=id?`${t("room")} ${r.n}`:t("newRoom");
   [["n","n"],["b","beds"],["cp","cap"],["c","cool"],["s","status"],["p","people"],["g","guest"],["ci","ci"],["cit","cit"],["co","co"],["cot","cot"],["no","notes"]].forEach(([i,k])=>$(i).value=r[k]??"");
-  const sr=rooms.find(x=>x.id==id);$("outNow").style.display=sr&&sr.status=="occupied"?"":"none";est();tick();$("dlg").showModal();
+  const sr=rooms.find(x=>x.id==id);$("outNow").style.display=sr&&sr.status=="occupied"?"":"none";$("delRm").style.display=sr?"":"none";est();tick();$("dlg").showModal();
 }
 const cur=()=>({beds:+$("b").value,cool:$("c").value,ci:$("ci").value,co:$("co").value});
 function est(){const r=cur(),n=nights(r),p=rate(r);$("est").textContent=money(p)+" / "+t("night")+(n?` · ${n} ${t("night")} · ${money(n*p)}`:"");chk()}
@@ -281,6 +282,17 @@ function chk(){$("p").setCustomValidity(+$("p").value>+$("cp").value?t("over"):"
 $("cinNow").onclick=()=>{const d=new Date();$("s").value="occupied";$("ci").value=ymd(d);$("cit").value=hm(d);if(!+$("p").value)$("p").value=1;est();$("g").focus()};
 $("add").onclick=()=>openDlg(null);
 $("cx").onclick=$("x").onclick=()=>$("dlg").close();
+function remote(fn,body){if(!useDb)return;busy++;lastSave=Date.now();rpc(fn,{p_code:CODE,...body}).then(()=>net("on")).catch(()=>{net("err");alert(t("delFail"))}).finally(()=>{busy--;lastSave=Date.now();lastSig=""})}
+$("delRm").onclick=()=>{
+  const r=rooms.find(x=>x.id==editing);if(!r||!confirm(t("confirmDel")))return;
+  if(r.status=="occupied"){const n=new Date();logStay({...r,co:ymd(n),cot:hm(n)})}
+  $("dlg").close();rooms=rooms.filter(x=>x.id!=r.id);delete synced.rooms[r.id];
+  save();remote("gh_delete_room",{p_id:r.id});render();
+};
+$("clrH").onclick=()=>{
+  if(!confirm(t("confirmClear")))return;
+  hist=[];synced.hist={};save();remote("gh_clear_hist",{});renderHist();
+};
 
 function logStay(s){const ci=s.ci||s.co;if(!ci)return;hist.push({id:"h"+Date.now()+Math.random().toString(36).slice(2,6),n:s.n,beds:s.beds,guest:s.guest,people:s.people,notes:s.notes||"",ci,cit:s.ci?s.cit:s.cot,co:s.co,cot:s.cot})}
 const clear={guest:"",people:0,ci:"",cit:"",co:"",cot:""};
