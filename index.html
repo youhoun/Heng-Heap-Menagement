@@ -2,8 +2,6 @@
 <html lang="km">
 <head>
 <meta charset="utf-8">
-<meta name="color-scheme" content="light dark">
-<script>try{document.documentElement.dataset.theme=localStorage.getItem("gh-theme")||"dark"}catch(e){document.documentElement.dataset.theme="dark"}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>HENG HEAP Guest House</title>
 <link href="https://fonts.googleapis.com/css2?family=Kantumruy+Pro:wght@400;600;700&display=swap" rel="stylesheet">
@@ -65,7 +63,6 @@ dialog::backdrop{background:rgba(0,0,0,.45)}
 .x{flex:none;width:44px;height:44px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:1.3rem;line-height:1}
 .btn.main{flex:1;min-height:40px;padding:8px 14px}
 .btn.out{background:var(--fix);color:#fff}
-:root[data-theme="dark"] .btn.out{color:#121917}
 .tw{overflow-x:auto;margin-top:12px}
 table{border-collapse:collapse;width:100%;font-size:.88rem}
 th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
@@ -80,9 +77,6 @@ input,select,textarea{display:block;width:100%;margin-top:3px;font:inherit;color
 .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap}
 .actions .spacer{margin-right:auto}
 .est{font-weight:600;min-height:1.4em}
-.kv{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line)}
-.kv span{color:var(--mute)}
-.kv b{text-align:right}
 </style>
 </head>
 <body>
@@ -92,7 +86,6 @@ input,select,textarea{display:block;width:100%;margin-top:3px;font:inherit;color
   <div class="hbtns">
     <button class="btn ghost" id="hbtn" data-i18n="hist"></button>
     <button class="btn ghost" id="chg" data-i18n="codeChg"></button>
-    <button class="btn ghost" id="theme"></button>
     <button class="btn ghost" id="lang"></button>
     <button class="btn ghost" id="add" data-i18n="add"></button>
     <button class="btn" id="xl" data-i18n="export"></button>
@@ -151,10 +144,6 @@ input,select,textarea{display:block;width:100%;margin-top:3px;font:inherit;color
   <div class="dh"><h2 data-i18n="histT"></h2><button type="button" class="x" id="hx">✕</button></div>
   <div class="db"><div class="filters" id="htabs"></div><div id="hbody"></div></div>
 </dialog>
-<dialog id="ddlg">
-  <div class="dh"><h2 id="ddt"></h2><button type="button" class="x" id="dx">✕</button></div>
-  <div class="db"><div id="dbody"></div><div class="actions"><button type="button" class="btn" id="dedit" data-i18n="edit"></button></div></div>
-</dialog>
 <dialog id="lock">
   <div class="dh"><h2 data-i18n="codeT"></h2></div>
   <form class="db" id="lf">
@@ -167,7 +156,7 @@ input,select,textarea{display:block;width:100%;margin-top:3px;font:inherit;color
 <div id="toast" role="status"></div>
 
 <script>
-const L={km:{view:"មើលលម្អិត",dPrice:"តម្លៃក្នុងមួយយប់",dTotal:"តម្លៃសរុប",dPast:"ប្រវត្តិស្នាក់នៅក្នុងបន្ទប់នេះ",dNone:"មិនទាន់មានប្រវត្តិទេ។",themeD:"🌙 ងងឹត",themeL:"☀ ភ្លឺ",codeT:"បញ្ចូលកូដចូលប្រើ",codeH:"កូដនេះរក្សាទិន្នន័យរបស់ HENG HEAP។ បុគ្គលិកទាំងអស់ប្រើកូដតែមួយ ទើបឃើញទិន្នន័យដូចគ្នា។ កុំប្រាប់កូដនេះទៅអ្នកផ្សេង។",codeL:"កូដចូលប្រើ (យ៉ាងតិច 8 តួ អក្សរ a-z ឬលេខ)",codeGo:"ចូល",codeBad:"កូដត្រូវមានយ៉ាងតិច 8 តួ (a-z ឬ 0-9)",codeChg:"ប្តូរកូដ",netOn:"ទិន្នន័យចែករំលែក (អនឡាញ)",netErr:"មិនអាចតភ្ជាប់មូលដ្ឋានទិន្នន័យ",netLocal:"មិនទាន់តភ្ជាប់មូលដ្ឋានទិន្នន័យ ទិន្នន័យនៅលើឧបករណ៍នេះប៉ុណ្ណោះ",netWait:"កំពុងតភ្ជាប់…",hist:"ប្រវត្តិ",histT:"ប្រវត្តិភ្ញៀវ",byDay:"តាមថ្ងៃ",stays:"ការស្នាក់ទាំងអស់",outNow:"ចាកចេញឥឡូវនេះ",close:"បិទ",recorded:"បានកត់ត្រា",noHist:"មិនទាន់មានប្រវត្តិទេ។ ប្រវត្តិនឹងបង្ហាញនៅពេលមានភ្ញៀវចូលស្នាក់។",hInR:"ចូលស្នាក់ (បន្ទប់)",hInP:"ចូលស្នាក់ (នាក់)",hInT:"ម៉ោងចូលស្នាក់",hOutT:"ម៉ោងចាកចេញ",title:"ផ្ទះសំណាក់ HENG HEAP",add:"បន្ថែមបន្ទប់",export:"នាំចេញជា Excel",prices:"តម្លៃក្នុងមួយយប់ ($)",b2:"គ្រែ 2",b1:"គ្រែ 1",ac:"ម៉ាស៊ីនត្រជាក់",fan:"កង្ហារ",all:"ទាំងអស់",
+const L={km:{codeT:"បញ្ចូលកូដចូលប្រើ",codeH:"កូដនេះរក្សាទិន្នន័យរបស់ HENG HEAP។ បុគ្គលិកទាំងអស់ប្រើកូដតែមួយ ទើបឃើញទិន្នន័យដូចគ្នា។ កុំប្រាប់កូដនេះទៅអ្នកផ្សេង។",codeL:"កូដចូលប្រើ (យ៉ាងតិច 8 តួ អក្សរ a-z ឬលេខ)",codeGo:"ចូល",codeBad:"កូដត្រូវមានយ៉ាងតិច 8 តួ (a-z ឬ 0-9)",codeChg:"ប្តូរកូដ",netOn:"ទិន្នន័យចែករំលែក (អនឡាញ)",netErr:"មិនអាចតភ្ជាប់មូលដ្ឋានទិន្នន័យ",netLocal:"មិនទាន់តភ្ជាប់មូលដ្ឋានទិន្នន័យ ទិន្នន័យនៅលើឧបករណ៍នេះប៉ុណ្ណោះ",netWait:"កំពុងតភ្ជាប់…",hist:"ប្រវត្តិ",histT:"ប្រវត្តិភ្ញៀវ",byDay:"តាមថ្ងៃ",stays:"ការស្នាក់ទាំងអស់",outNow:"ចាកចេញឥឡូវនេះ",close:"បិទ",recorded:"បានកត់ត្រា",noHist:"មិនទាន់មានប្រវត្តិទេ។ ប្រវត្តិនឹងបង្ហាញនៅពេលមានភ្ញៀវចូលស្នាក់។",hInR:"ចូលស្នាក់ (បន្ទប់)",hInP:"ចូលស្នាក់ (នាក់)",hInT:"ម៉ោងចូលស្នាក់",hOutT:"ម៉ោងចាកចេញ",title:"ផ្ទះសំណាក់ HENG HEAP",add:"បន្ថែមបន្ទប់",export:"នាំចេញជា Excel",prices:"តម្លៃក្នុងមួយយប់ ($)",b2:"គ្រែ 2",b1:"គ្រែ 1",ac:"ម៉ាស៊ីនត្រជាក់",fan:"កង្ហារ",all:"ទាំងអស់",
 st_available:"ទំនេរ",st_occupied:"មានភ្ញៀវ",st_cleaning:"ត្រូវសម្អាត",st_maintenance:"កំពុងជួសជុល",dbl:"បន្ទប់គ្រែ 2",sgl:"បន្ទប់គ្រែ 1",room:"បន្ទប់លេខ",roomNo:"លេខបន្ទប់",beds:"ចំនួនគ្រែ",
 cool:"ម៉ាស៊ីនត្រជាក់ ឬកង្ហារ",status:"ស្ថានភាព",capL:"ចំណុះអតិបរមា (នាក់)",peopleL:"ចំនួនភ្ញៀវ (នាក់)",guest:"ឈ្មោះភ្ញៀវ",cin:"ចូលស្នាក់",cout:"ចាកចេញ",cinNow:"ចូលស្នាក់ឥឡូវនេះ",
 cinD:"ថ្ងៃចូលស្នាក់",cinT:"ម៉ោងចូលស្នាក់",coD:"ថ្ងៃចាកចេញ",coT:"ម៉ោងចាកចេញ",markReady:"សម្អាតរួច",edit:"កែប្រែ",del:"លុប",delRoom:"លុបបន្ទប់",save:"រក្សាទុក",cancel:"បោះបង់",notes:"កំណត់ចំណាំ",
@@ -176,7 +165,7 @@ empty:"មិនមានបន្ទប់ទេ។ ជ្រើសរើសត
 noXlsx:"មិនអាចផ្ទុកឧបករណ៍ Excel បានទេ។ សូមពិនិត្យអ៊ីនធឺណិត ហើយផ្ទុកទំព័រឡើងវិញ។",noSave:"មិនអាចរក្សាទុកឯកសារក្នុងទិដ្ឋភាពនេះទេ។ សូមបើកក្នុង claude.ai។",saveFail:"មិនអាចរក្សាទុកឯកសារបានទេ។",
 hRoom:"បន្ទប់",hBeds:"គ្រែ",hGuest:"ភ្ញៀវ",hPeople:"ចំនួនអ្នកស្នាក់ (នាក់)",hNights:"ចំនួនយប់",hStatus:"ស្ថានភាព",inHouse:"កំពុងស្នាក់",out:"ចាកចេញរួច",hDate:"កាលបរិច្ឆេទ",hRoomsOcc:"ចំនួនបន្ទប់មានភ្ញៀវ",
 hMonth:"ខែ",hCheckins:"ចំនួនដងចូលស្នាក់",hPeopleCI:"ភ្ញៀវចូលស្នាក់ (នាក់)",hRoomNights:"បន្ទប់-យប់សរុប",hAvg:"បន្ទប់ជាមធ្យមក្នុងមួយថ្ងៃ",shG:"ភ្ញៀវចូល-ចេញ",shD:"ក្នុងមួយថ្ងៃ",shM:"ក្នុងមួយខែ"},
-en:{view:"Details",dPrice:"Price per night",dTotal:"Total price",dPast:"Past stays in this room",dNone:"No past stays yet.",themeD:"🌙 Dark",themeL:"☀ Light",codeT:"Enter access code",codeH:"This code keeps HENG HEAP data private. All staff use the same code to see the same data. Do not share it with anyone else.",codeL:"Access code (at least 8 letters a-z or numbers)",codeGo:"Enter",codeBad:"The code needs at least 8 characters (a-z or 0-9)",codeChg:"Change code",netOn:"Shared data (online)",netErr:"Cannot reach the database",netLocal:"Database not connected. Data stays on this device only.",netWait:"Connecting…",hist:"History",histT:"Guest history",byDay:"By day",stays:"All stays",outNow:"Check out now",close:"Close",recorded:"Recorded",noHist:"No history yet. It appears once guests check in.",hInR:"Check-ins (rooms)",hInP:"Check-ins (people)",hInT:"Check-in times",hOutT:"Check-out times",title:"HENG HEAP Guest House",add:"Add room",export:"Export to Excel",prices:"Prices per night ($)",b2:"2 beds",b1:"1 bed",ac:"AC",fan:"Fan",all:"All",
+en:{codeT:"Enter access code",codeH:"This code keeps HENG HEAP data private. All staff use the same code to see the same data. Do not share it with anyone else.",codeL:"Access code (at least 8 letters a-z or numbers)",codeGo:"Enter",codeBad:"The code needs at least 8 characters (a-z or 0-9)",codeChg:"Change code",netOn:"Shared data (online)",netErr:"Cannot reach the database",netLocal:"Database not connected. Data stays on this device only.",netWait:"Connecting…",hist:"History",histT:"Guest history",byDay:"By day",stays:"All stays",outNow:"Check out now",close:"Close",recorded:"Recorded",noHist:"No history yet. It appears once guests check in.",hInR:"Check-ins (rooms)",hInP:"Check-ins (people)",hInT:"Check-in times",hOutT:"Check-out times",title:"HENG HEAP Guest House",add:"Add room",export:"Export to Excel",prices:"Prices per night ($)",b2:"2 beds",b1:"1 bed",ac:"AC",fan:"Fan",all:"All",
 st_available:"Available",st_occupied:"Occupied",st_cleaning:"Needs cleaning",st_maintenance:"Maintenance",dbl:"Double rooms (2 beds)",sgl:"Single rooms (1 bed)",room:"Room",roomNo:"Room number",beds:"Beds",
 cool:"AC or fan",status:"Status",capL:"Max people",peopleL:"Guests staying",guest:"Guest name",cin:"Check in",cout:"Check out",cinNow:"Check in now",
 cinD:"Check-in date",cinT:"Check-in time",coD:"Check-out date",coT:"Check-out time",markReady:"Mark clean",edit:"Edit",del:"Delete",delRoom:"Delete room",save:"Save room",cancel:"Cancel",notes:"Notes",
@@ -196,8 +185,10 @@ const SB_URL="https://qivndolqdzbxrodxybls.supabase.co",SB_KEY="sb_publishable_8
 const useDb=true;
 const CKEY="gh-code";
 let CODE="",busy=0,lastSave=0,loaded=false,lastSig="";const synced={rooms:{},hist:{},prices:null};
-const seed=()=>[1,2,3,4,5,7,8,9,10,11,12,13].map(n=>({id:"r"+n,n:String(n),beds:[1,2,8,9].includes(n)?2:1,cap:n==1?4:2,cool:"fan",status:"available",guest:"",people:0,ci:"",cit:"",co:"",cot:"",notes:""}));
+function capFix(){try{if(localStorage.getItem("gh-cap4"))return false;localStorage.setItem("gh-cap4","1")}catch(e){return false}let c=false;rooms.forEach(r=>{if((+r.cap||0)<4){r.cap=4;c=true}});return c}
+const seed=()=>[1,2,3,4,5,7,8,9,10,11,12,13].map(n=>({id:"r"+n,n:String(n),beds:[1,2,8,9].includes(n)?2:1,cap:4,cool:"fan",status:"available",guest:"",people:0,ci:"",cit:"",co:"",cot:"",notes:""}));
 if(!useDb)try{rooms=JSON.parse(localStorage.getItem(KEY)||"null")||seed()}catch(e){rooms=seed()}
+if(!useDb&&capFix())try{localStorage.setItem(KEY,JSON.stringify(rooms))}catch(e){}
 if(!useDb)try{hist=JSON.parse(localStorage.getItem(HKEY)||"[]")}catch(e){}
 if(!useDb)try{prices={...DEF,...JSON.parse(localStorage.getItem(PKEY)||"{}")}}catch(e){}
 const rpc=(fn,body)=>fetch(SB_URL+"/rest/v1/rpc/"+fn,{method:"POST",headers:{apikey:SB_KEY,"Content-Type":"application/json"},body:JSON.stringify(body)})
@@ -250,7 +241,7 @@ function tile(r){
   <span class="price">${money(rate(r))} / ${t("night")}</span>
   ${r.status=="occupied"?`<span class="guest">${esc(r.guest)||"—"} · ${r.people||0} ${t("ppl")}</span>
   <span class="type">${t("cin")}: ${r.ci?fmt(r.ci)+" "+(r.cit||""):"—"}${r.co?` · ${t("cout")}: ${fmt(r.co)} ${r.cot||""}`:""}${n?` · ${n} ${t("night")} · ${money(total(r))}`:""}</span>`:""}
-  <div class="tools">${btn}<button class="btn ghost sm" data-a="view" data-id="${r.id}">${t("view")}</button><button class="btn ghost sm" data-a="edit" data-id="${r.id}">${t("edit")}</button></div></div>`;
+  <div class="tools">${btn}<button class="btn ghost sm" data-a="edit" data-id="${r.id}">${t("edit")}</button></div></div>`;
 }
 function render(){
   const cnt=k=>rooms.filter(r=>r.status==k).length,occ=rooms.filter(r=>r.status=="occupied");
@@ -271,25 +262,9 @@ function render(){
 function applyLang(){
   document.documentElement.lang=lang;document.title=t("title");
   document.querySelectorAll("[data-i18n]").forEach(e=>e.textContent=t(e.dataset.i18n));
-  $("lang").textContent=lang=="km"?"English":"ខ្មែរ";$("x").title=$("hx").title=$("dx").title=t("close");net(netS);updTheme();render();if($("hdlg").open)renderHist();
+  $("lang").textContent=lang=="km"?"English":"ខ្មែរ";$("x").title=$("hx").title=t("close");net(netS);render();if($("hdlg").open)renderHist();
 }
 $("lang").onclick=()=>{lang=lang=="km"?"en":"km";try{localStorage.setItem(LKEY,lang)}catch(e){}applyLang()};
-function updTheme(){$("theme").textContent=document.documentElement.dataset.theme=="dark"?t("themeL"):t("themeD")}
-let viewing=null;
-function showDetail(id){
-  const r=rooms.find(x=>x.id==id);if(!r)return;viewing=id;
-  const kv=(l,v)=>`<div class="kv"><span>${esc(l)}</span><b>${esc(v)}</b></div>`;
-  let h=kv(t("status"),t("st_"+r.status))+kv(t("beds"),r.beds==2?t("b2"):t("b1"))+kv(t("cap"),r.cap+" "+t("ppl"))+kv(t("cool"),r.cool=="ac"?t("ac"):t("fan"))+kv(t("dPrice"),money(rate(r)));
-  if(r.status=="occupied")h+=kv(t("guest"),r.guest||"—")+kv(t("peopleL"),r.people||0)+kv(t("cin"),r.ci?fy(r.ci)+" "+(r.cit||""):"—")+kv(t("cout"),r.co?fy(r.co)+" "+(r.cot||""):"—")+kv(t("hNights"),nights(r))+kv(t("dTotal"),money(total(r)));
-  h+=kv(t("notes"),r.notes||"—");
-  const past=hist.filter(x=>x.n==r.n).sort((a,b)=>(b.ci+b.cit).localeCompare(a.ci+a.cit)).slice(0,10);
-  h+=`<h3 style="margin:18px 0 0;font-size:1rem">${t("dPast")}</h3>`+(past.length?table([t("hGuest"),t("hPeople"),t("cin"),t("cout"),t("hNights")],past.map(x=>[x.guest||"—",+x.people||0,fy(x.ci)+" "+(x.cit||""),x.co?fy(x.co)+" "+(x.cot||""):"—",nights(x)])):`<p class="sub" style="margin-top:8px">${t("dNone")}</p>`);
-  $("ddt").textContent=`${t("room")} ${r.n}`;$("dbody").innerHTML=h;$("ddlg").showModal();
-}
-$("dx").onclick=()=>$("ddlg").close();
-$("dedit").onclick=()=>{$("ddlg").close();openDlg(viewing)};
-$("ddlg").addEventListener("click",e=>{if(e.target==$("ddlg"))$("ddlg").close()});
-$("theme").onclick=()=>{const n=document.documentElement.dataset.theme=="dark"?"light":"dark";document.documentElement.dataset.theme=n;try{localStorage.setItem("gh-theme",n)}catch(e){}updTheme()};
 
 function openDlg(id,inNow){
   editing=id;const now=new Date();
@@ -307,7 +282,7 @@ $("cinNow").onclick=()=>{const d=new Date();$("s").value="occupied";$("ci").valu
 $("add").onclick=()=>openDlg(null);
 $("cx").onclick=$("x").onclick=()=>$("dlg").close();
 
-function logStay(s){const ci=s.ci||s.co;if(!ci)return;hist.push({id:"h"+Date.now()+Math.random().toString(36).slice(2,6),n:s.n,beds:s.beds,guest:s.guest,people:s.people,ci,cit:s.ci?s.cit:s.cot,co:s.co,cot:s.cot})}
+function logStay(s){const ci=s.ci||s.co;if(!ci)return;hist.push({id:"h"+Date.now()+Math.random().toString(36).slice(2,6),n:s.n,beds:s.beds,guest:s.guest,people:s.people,notes:s.notes||"",ci,cit:s.ci?s.cit:s.cot,co:s.co,cot:s.cot})}
 const clear={guest:"",people:0,ci:"",cit:"",co:"",cot:""};
 let tt;function toast(m){const e=$("toast");e.textContent=m;e.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>e.classList.remove("show"),4500)}
 function checkout(r){const d=new Date();logStay({...r,co:ymd(d),cot:hm(d)});Object.assign(r,clear,{status:"cleaning"});save();render();toast(`✓ ${t("recorded")}: ${t("room")} ${r.n} · ${t("cout")} ${fmt(ymd(d))} ${hm(d)}`)}
@@ -317,7 +292,6 @@ document.querySelector("main").addEventListener("click",e=>{
   const b=e.target.closest("[data-a]");if(!b)return;
   const r=rooms.find(x=>x.id==b.dataset.id),a=b.dataset.a;
   if(a=="edit")openDlg(r.id);
-  else if(a=="view")showDetail(r.id);
   else if(a=="in")openDlg(r.id,true);
   else if(a=="ready"){r.status="available";save();render()}
   else if(a=="out"&&confirm(t("confirmOut")))checkout(r);
@@ -325,18 +299,18 @@ document.querySelector("main").addEventListener("click",e=>{
 $("f").onsubmit=()=>{
   const d={n:$("n").value.trim(),beds:+$("b").value,cap:+$("cp").value||1,cool:$("c").value,status:$("s").value,guest:$("g").value.trim(),people:+$("p").value||0,ci:$("ci").value,cit:$("cit").value,co:$("co").value,cot:$("cot").value,notes:$("no").value.trim()};
   const old=rooms.find(x=>x.id==editing),now=new Date();
-  if(old&&old.status=="occupied"&&d.status!="occupied")logStay({...old,co:d.co||old.co||ymd(now),cot:d.cot||old.cot||hm(now)});
+  if(old&&old.status=="occupied"&&d.status!="occupied")logStay({...old,notes:d.notes,co:d.co||old.co||ymd(now),cot:d.cot||old.cot||hm(now)});
   if(d.status!="occupied")Object.assign(d,clear);
   if(old)Object.assign(old,d);else rooms.push({id:"r"+Date.now(),...d});
   rooms.sort(byNum);save();render();
 };
 
-const ev=(s,tm)=>`${t("room")} ${s.n} · ${tm||"—"}`;
+const ev=(s,tm)=>`${t("room")} ${s.n}${s.guest?" · "+s.guest:""} · ${tm||"—"}${s.notes?" ("+s.notes+")":""}`;
 const fy=d=>d?fmt(d)+" "+d.slice(0,4):"—";
 const tot=(a,f)=>a.reduce((x,s)=>x+(+f(s)||0),0);
 function calc(){
   const now=new Date(),today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-  const all=[...hist.map(h=>({...h,live:0})),...rooms.filter(r=>r.status=="occupied").map(r=>({n:r.n,beds:r.beds,guest:r.guest,people:r.people,ci:r.ci,cit:r.cit,co:r.co,cot:r.cot,live:1}))]
+  const all=[...hist.map(h=>({...h,live:0})),...rooms.filter(r=>r.status=="occupied").map(r=>({n:r.n,beds:r.beds,guest:r.guest,people:r.people,notes:r.notes,ci:r.ci,cit:r.cit,co:r.co,cot:r.cot,live:1}))]
     .sort((a,b)=>(a.ci+a.cit).localeCompare(b.ci+b.cit));
   const map={},slot=k=>map[k]=map[k]||{r:0,p:0,ins:[],outs:[]};let lo=null,hi=null;
   const span=(a,e)=>{if(!lo||a<lo)lo=a;if(!hi||e>hi)hi=e};
@@ -360,7 +334,7 @@ function renderHist(){
   $("htabs").innerHTML=[["day","byDay"],["stays","stays"]].map(([k,l])=>`<button class="chip" data-h="${k}" aria-pressed="${ht==k}">${t(l)}</button>`).join("");
   $("hbody").innerHTML=!all.length?`<div class="empty" style="margin-top:12px">${t("noHist")}</div>`:ht=="day"
     ?table([t("hDate"),t("hRoomsOcc"),t("hPeople"),t("hInR"),t("hInP"),t("hInT"),t("hOutT")],days.slice().reverse().map(d=>{const r=dayRow(d,"\n");r[0]=fy(d.k);return r}))
-    :table([t("hRoom"),t("hGuest"),t("hPeople"),t("cin"),t("cout"),t("hNights"),t("hStatus")],all.slice().reverse().map(s=>[s.n,s.guest||"—",+s.people||0,s.ci?fy(s.ci)+" "+(s.cit||""):"—",s.co?fy(s.co)+" "+(s.cot||""):"—",nights(s),s.live?t("inHouse"):t("out")]));
+    :table([t("hRoom"),t("hGuest"),t("hPeople"),t("cin"),t("cout"),t("hNights"),t("hStatus"),t("notes")],all.slice().reverse().map(s=>[s.n,s.guest||"—",+s.people||0,s.ci?fy(s.ci)+" "+(s.cit||""):"—",s.co?fy(s.co)+" "+(s.cot||""):"—",nights(s),s.live?t("inHouse"):t("out"),s.notes||""]));
 }
 $("hbtn").onclick=()=>{renderHist();$("hdlg").showModal()};
 $("htabs").onclick=e=>{const b=e.target.closest("[data-h]");if(b){ht=b.dataset.h;renderHist()}};
@@ -371,8 +345,8 @@ $("xl").onclick=async()=>{
   if(!window.XLSX){alert(t("noXlsx"));return}
   let dl=null;try{dl=await claude.use("downloads")}catch(e){}
   const now=new Date(),{all,days}=calc();
-  const g=[[t("hRoom"),t("hBeds"),t("hGuest"),t("hPeople"),t("cinD"),t("cinT"),t("coD"),t("coT"),t("hNights"),t("hStatus")]];
-  all.forEach(s=>g.push([s.n,s.beds,s.guest,+s.people||0,s.ci,s.cit,s.co,s.cot,nights(s),s.live?t("inHouse"):t("out")]));
+  const g=[[t("hRoom"),t("hBeds"),t("hGuest"),t("hPeople"),t("cinD"),t("cinT"),t("coD"),t("coT"),t("hNights"),t("hStatus"),t("notes")]];
+  all.forEach(s=>g.push([s.n,s.beds,s.guest,+s.people||0,s.ci,s.cit,s.co,s.cot,nights(s),s.live?t("inHouse"):t("out"),s.notes||""]));
   const dd=[[t("hDate"),t("hRoomsOcc"),t("hPeople"),t("hInR"),t("hInP"),t("hInT"),t("hOutT")],...days.map(d=>dayRow(d,"; "))];
   const mm={},mk=k=>mm[k]=mm[k]||{c:0,p:0,rn:0};
   days.forEach(d=>{mk(d.k.slice(0,7)).rn+=d.r});
@@ -380,7 +354,7 @@ $("xl").onclick=async()=>{
   const mo=[[t("hMonth"),t("hCheckins"),t("hPeopleCI"),t("hRoomNights"),t("hAvg")]];
   Object.keys(mm).sort().forEach(k=>{const[y,m]=k.split("-"),x=mm[k],n=new Date(+y,+m,0).getDate();mo.push([k,x.c,x.p,x.rn,Math.round(x.rn/n*10)/10])});
   const wb=XLSX.utils.book_new();
-  [[g,t("shG"),[8,6,20,10,12,10,12,10,8,14]],[dd,t("shD"),[14,18,14,16,16,45,45]],[mo,t("shM"),[10,16,18,16,22]]].forEach(([rows,name,w])=>{
+  [[g,t("shG"),[8,6,20,10,12,10,12,10,8,14,40]],[dd,t("shD"),[14,18,14,16,16,60,60]],[mo,t("shM"),[10,16,18,16,22]]].forEach(([rows,name,w])=>{
     const ws=XLSX.utils.aoa_to_sheet(rows);ws["!cols"]=w.map(x=>({wch:x}));XLSX.utils.book_append_sheet(wb,ws,name);
   });
   const buf=XLSX.write(wb,{type:"array",bookType:"xlsx"});
@@ -400,6 +374,7 @@ async function pull(){
     synced.rooms={};rooms.forEach(r=>synced.rooms[r.id]=JSON.stringify(r));
     synced.hist={};hist.forEach(h=>synced.hist[h.id]=1);synced.prices=JSON.stringify(prices);
     loaded=true;net("on");
+    if(capFix())save();
     document.querySelectorAll("[data-p]").forEach(i=>{if(document.activeElement!==i)i.value=prices[i.dataset.p]});
     render();if($("hdlg").open)renderHist();
   }catch(e){net("err")}
