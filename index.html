@@ -321,6 +321,8 @@ function stays(){
   return [...hist.map(h=>({...h,live:0})),...rooms.filter(r=>r.status=="occupied").map(r=>({n:r.n,beds:r.beds,cool:r.cool,mode:r.mode,hrs:r.hrs,guest:r.guest,people:r.people,m:r.m,w:r.w,c:r.c,notes:r.notes,ci:r.ci,cit:r.cit,co:r.co,cot:r.cot,amount:amtOf(r),live:1}))]
     .sort((a,b)=>((a.ci||"")+(a.cit||"")).localeCompare((b.ci||"")+(b.cit||"")));
 }
+const inMs=r=>r.ci?new Date(r.ci+"T"+(r.cit||"00:00")).getTime():Infinity;
+const byStay=(a,b)=>{const ao=a.status=="occupied",bo=b.status=="occupied";if(ao!==bo)return ao?-1:1;if(ao&&bo){const x=inMs(a),y=inMs(b);if(x!==y)return x<y?-1:1}return byNum(a,b)};
 function render(){
   const cnt=k=>rooms.filter(r=>r.status==k).length,occ=rooms.filter(r=>r.status=="occupied");
   $("sum").textContent=`${rooms.length} ${t("rooms")} · ${occ.length} ${t("occ")} · ${cnt("available")} ${t("avail")}`;
@@ -330,7 +332,7 @@ function render(){
   $("filters").innerHTML=[["all",t("all"),rooms.length],...Object.keys(ST).map(k=>[k,t("st_"+k),cnt(k)])]
     .map(([k,l,c])=>`<button class="chip" data-f="${k}" aria-pressed="${filter==k}">${k!="all"?`<span class="dot" style="background:${ST[k]}"></span>`:""}${l} ${c}</button>`).join("");
   [[2,"g2","h2","dbl"],[1,"g1","h1","sgl"]].forEach(([b,g,h,key])=>{
-    const all=rooms.filter(r=>r.beds==b),list=all.filter(r=>filter=="all"||r.status==filter);
+    const all=rooms.filter(r=>r.beds==b),list=all.filter(r=>filter=="all"||r.status==filter).sort(byStay);
     $(h).innerHTML=`${t(key)} <small>${list.length}</small>`;
     $(g).innerHTML=list.length?list.map(tile).join(""):`<div class="empty">${t("empty")}</div>`;
   });
@@ -578,5 +580,3 @@ $("chg").onclick=()=>{try{localStorage.removeItem(CKEY)}catch(e){}location.reloa
 rooms.sort(byNum);applyLang();
 if(useDb){let c="";try{c=localStorage.getItem(CKEY)||""}catch(e){}c.length>=8?startDb(c):$("lock").showModal()}
 </script>
-</body>
-</html>
