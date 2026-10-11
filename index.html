@@ -77,6 +77,18 @@ input,select,textarea{display:block;width:100%;margin-top:3px;font:inherit;color
 .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:8px;flex-wrap:wrap}
 .actions .spacer{margin-right:auto}
 .est{font-weight:600;min-height:1.4em}
+.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.cd{font-weight:700;font-size:1.2rem;font-variant-numeric:tabular-nums;color:var(--busy);line-height:1.3}
+.cd.up{color:var(--fix);animation:pulse 1s ease-in-out infinite}
+.room.up{outline:2px solid var(--fix);outline-offset:-2px}
+@keyframes pulse{50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){.cd.up{animation:none}}
+.tag{align-self:flex-start;font-size:.8rem;font-weight:600;border:1px solid var(--busy);color:var(--busy);border-radius:999px;padding:0 10px}
+.tot{font-size:1.25rem;font-weight:700}
+.amt{font-weight:700;color:var(--accent);font-size:1.05rem}
+.arow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+dialog.alert{border:3px solid var(--fix)}
+.hint{color:var(--mute);font-size:.8rem;margin:-6px 0 10px}
 </style>
 </head>
 <body>
@@ -101,6 +113,14 @@ input,select,textarea{display:block;width:100%;margin-top:3px;font:inherit;color
     <label><span data-i18n="b1"></span> · <span data-i18n="ac"></span><input type="number" min="0" step="0.5" data-p="1-ac"></label>
     <label><span data-i18n="b1"></span> · <span data-i18n="fan"></span><input type="number" min="0" step="0.5" data-p="1-fan"></label>
   </div>
+  <p class="sub" style="margin-top:14px" data-i18n="hrPrices"></p>
+  <div class="prices">
+    <label><span data-i18n="b2"></span> · <span data-i18n="ac"></span><input type="number" min="0" step="0.5" data-p="h-2-ac"></label>
+    <label><span data-i18n="b2"></span> · <span data-i18n="fan"></span><input type="number" min="0" step="0.5" data-p="h-2-fan"></label>
+    <label><span data-i18n="b1"></span> · <span data-i18n="ac"></span><input type="number" min="0" step="0.5" data-p="h-1-ac"></label>
+    <label><span data-i18n="b1"></span> · <span data-i18n="fan"></span><input type="number" min="0" step="0.5" data-p="h-1-fan"></label>
+    <label><span data-i18n="hhL"></span><input type="number" min="0.5" step="0.5" data-p="hh"></label>
+  </div>
 </details>
 <div class="filters" id="filters"></div>
 <h2 id="h2"></h2><div class="grid" id="g2"></div>
@@ -120,8 +140,15 @@ input,select,textarea{display:block;width:100%;margin-top:3px;font:inherit;color
     </div>
     <div class="row">
       <label><span data-i18n="status"></span><select id="s"></select></label>
-      <label><span data-i18n="peopleL"></span><input id="p" type="number" min="0" max="30"></label>
+      <label><span data-i18n="stayType"></span><select id="md"><option value="night" data-i18n="nightMode"></option><option value="hour" data-i18n="hrMode"></option></select></label>
     </div>
+    <label id="hrsW" style="display:none"><span data-i18n="hrsL"></span><input id="hrs" type="number" min="0.5" step="0.5"></label>
+    <div class="row3">
+      <label><span data-i18n="gMen"></span><select id="m"></select></label>
+      <label><span data-i18n="gWomen"></span><select id="w"></select></label>
+      <label><span data-i18n="gKids"></span><select id="k"></select></label>
+    </div>
+    <div class="hint" id="ptot"></div>
     <label><span data-i18n="guest"></span><input id="g"></label>
     <div class="nowrow"><button type="button" class="btn" id="cinNow" data-i18n="cinNow"></button><button type="button" class="btn out" id="outNow" data-i18n="outNow"></button><span class="clk" id="dclk"></span></div>
     <div class="row">
@@ -133,6 +160,7 @@ input,select,textarea{display:block;width:100%;margin-top:3px;font:inherit;color
       <label><span data-i18n="coT"></span><input id="cot" type="time"></label>
     </div>
     <label><span data-i18n="notes"></span><textarea id="no" rows="2"></textarea></label>
+    <label><span data-i18n="amtL"></span><input id="am" type="number" min="0" step="0.5" inputmode="decimal"></label>
     <div class="est" id="est"></div>
     <div class="actions">
       <button type="button" class="btn ghost" id="delRm" data-i18n="delRoom" style="margin-right:auto;color:#c0392b"></button>
@@ -143,7 +171,7 @@ input,select,textarea{display:block;width:100%;margin-top:3px;font:inherit;color
 </dialog>
 <dialog id="hdlg" class="wide">
   <div class="dh"><h2 data-i18n="histT"></h2><button type="button" class="x" id="hx">✕</button></div>
-  <div class="db"><div class="filters" id="htabs"></div><div id="hbody"></div><div style="margin-top:12px;text-align:right"><button type="button" class="btn ghost sm" id="clrH" style="color:#c0392b" data-i18n="clearHist"></button></div></div>
+  <div class="db"><div class="bar" id="hsum" style="margin-bottom:10px"></div><div class="filters" id="htabs"></div><div id="hbody"></div><div style="margin-top:12px;text-align:right"><button type="button" class="btn ghost sm" id="clrH" style="color:#c0392b" data-i18n="clearHist"></button></div></div>
 </dialog>
 <dialog id="lock">
   <div class="dh"><h2 data-i18n="codeT"></h2></div>
@@ -154,6 +182,24 @@ input,select,textarea{display:block;width:100%;margin-top:3px;font:inherit;color
     <div class="actions"><button type="submit" class="btn" data-i18n="codeGo"></button></div>
   </form>
 </dialog>
+<dialog id="bdlg">
+  <div class="dh"><h2 data-i18n="billT"></h2><button type="button" class="x" id="bx">✕</button></div>
+  <form method="dialog" class="db" id="bf">
+    <div id="binfo" style="margin-bottom:12px"></div>
+    <label><span data-i18n="billAmt"></span><input id="bam" type="number" min="0" step="0.5" inputmode="decimal" required></label>
+    <div class="hint" data-i18n="billHint"></div>
+    <div class="actions"><button type="button" class="btn ghost" id="bc" data-i18n="cancel"></button><button type="submit" class="btn out" data-i18n="billOk"></button></div>
+  </form>
+</dialog>
+<dialog id="adlg" class="alert">
+  <div class="dh"><h2>⏰ <span data-i18n="timeUp"></span></h2></div>
+  <div class="db"><div id="alist"></div><div class="actions"><button type="button" class="btn" id="aok" data-i18n="ok"></button></div></div>
+</dialog>
+<dialog id="vdlg">
+  <div class="dh"><h2 id="vt"></h2><button type="button" class="x" id="vx">✕</button></div>
+  <div class="db"><div class="tw" style="margin-top:0" id="vbody"></div>
+    <div class="actions"><button type="button" class="btn out" id="vbill" data-i18n="payOut"></button><button type="button" class="btn ghost" id="vedit" data-i18n="edit"></button><button type="button" class="btn ghost" id="vcl" data-i18n="close"></button></div></div>
+</dialog>
 <div id="toast" role="status"></div>
 
 <script>
@@ -161,25 +207,35 @@ const L={km:{codeT:"បញ្ចូលកូដចូលប្រើ",codeH:"ក
 st_available:"ទំនេរ",st_occupied:"មានភ្ញៀវ",st_cleaning:"ត្រូវសម្អាត",st_maintenance:"កំពុងជួសជុល",dbl:"បន្ទប់គ្រែ 2",sgl:"បន្ទប់គ្រែ 1",room:"បន្ទប់លេខ",roomNo:"លេខបន្ទប់",beds:"ចំនួនគ្រែ",
 cool:"ម៉ាស៊ីនត្រជាក់ ឬកង្ហារ",status:"ស្ថានភាព",capL:"ចំណុះអតិបរមា (នាក់)",peopleL:"ចំនួនភ្ញៀវ (នាក់)",guest:"ឈ្មោះភ្ញៀវ",cin:"ចូលស្នាក់",cout:"ចាកចេញ",cinNow:"ចូលស្នាក់ឥឡូវនេះ",
 cinD:"ថ្ងៃចូលស្នាក់",cinT:"ម៉ោងចូលស្នាក់",coD:"ថ្ងៃចាកចេញ",coT:"ម៉ោងចាកចេញ",markReady:"សម្អាតរួច",edit:"កែប្រែ",del:"លុប",delRoom:"លុបបន្ទប់",save:"រក្សាទុក",cancel:"បោះបង់",notes:"កំណត់ចំណាំ",
-night:"យប់",ppl:"នាក់",cap:"ចំណុះ",rooms:"បន្ទប់",occ:"មានភ្ញៀវ",avail:"ទំនេរ",sRooms:"បន្ទប់មានភ្ញៀវ",sGuests:"ភ្ញៀវកំពុងស្នាក់ (នាក់)",sNight:"ក្នុងមួយយប់ (បន្ទប់មានភ្ញៀវ)",sTotal:"សរុបនៃការស្នាក់ទាំងអស់",
+night:"យប់",ppl:"នាក់",cap:"ចំណុះ",rooms:"បន្ទប់",occ:"មានភ្ញៀវ",avail:"ទំនេរ",sRooms:"បន្ទប់មានភ្ញៀវ",sGuests:"ភ្ញៀវកំពុងស្នាក់ (នាក់)",sNight:"ក្នុងមួយយប់ (បន្ទប់មានភ្ញៀវ)",sTotal:"សរុបកំពុងស្នាក់",
 empty:"មិនមានបន្ទប់ទេ។ ជ្រើសរើសតម្រងផ្សេង ឬបន្ថែមបន្ទប់។",confirmDel:"តើអ្នកចង់លុបបន្ទប់នេះមែនទេ?",confirmOut:"ចាកចេញពីបន្ទប់នេះឥឡូវនេះ?",over:"ចំនួនភ្ញៀវលើសចំណុះបន្ទប់",newRoom:"បន្ទប់ថ្មី",
 noXlsx:"មិនអាចផ្ទុកឧបករណ៍ Excel បានទេ។ សូមពិនិត្យអ៊ីនធឺណិត ហើយផ្ទុកទំព័រឡើងវិញ។",noSave:"មិនអាចរក្សាទុកឯកសារក្នុងទិដ្ឋភាពនេះទេ។ សូមបើកក្នុង claude.ai។",saveFail:"មិនអាចរក្សាទុកឯកសារបានទេ។",
 hRoom:"បន្ទប់",hBeds:"គ្រែ",hGuest:"ភ្ញៀវ",hPeople:"ចំនួនអ្នកស្នាក់ (នាក់)",hNights:"ចំនួនយប់",hStatus:"ស្ថានភាព",inHouse:"កំពុងស្នាក់",out:"ចាកចេញរួច",hDate:"កាលបរិច្ឆេទ",hRoomsOcc:"ចំនួនបន្ទប់មានភ្ញៀវ",
-hMonth:"ខែ",hCheckins:"ចំនួនដងចូលស្នាក់",hPeopleCI:"ភ្ញៀវចូលស្នាក់ (នាក់)",hRoomNights:"បន្ទប់-យប់សរុប",hAvg:"បន្ទប់ជាមធ្យមក្នុងមួយថ្ងៃ",shG:"ភ្ញៀវចូល-ចេញ",shD:"ក្នុងមួយថ្ងៃ",shM:"ក្នុងមួយខែ"},
+hMonth:"ខែ",hCheckins:"ចំនួនដងចូលស្នាក់",hPeopleCI:"ភ្ញៀវចូលស្នាក់ (នាក់)",hRoomNights:"បន្ទប់-យប់សរុប",hAvg:"បន្ទប់ជាមធ្យមក្នុងមួយថ្ងៃ",shG:"ភ្ញៀវចូល-ចេញ",shD:"ក្នុងមួយថ្ងៃ",shM:"ក្នុងមួយខែ",view:"មើលលម្អិត",stayDur:"រយៈពេល",chargedL:"តម្លៃដែលយក",adjusted:"បានកែតម្លៃ",
+hrMode:"សម្រាកម៉ោង",nightMode:"ស្នាក់យប់",stayType:"ប្រភេទស្នាក់",hrsL:"ចំនួនម៉ោងសម្រាក",hr:"ម៉ោង",left:"នៅសល់",timeUp:"ដល់ម៉ោងហើយ!",ok:"យល់ព្រម",untilT:"ដល់ម៉ោង",
+hrPrices:"តម្លៃសម្រាកម៉ោង ($ ក្នុងមួយលើក)",hhL:"ចំនួនម៉ោងក្នុងមួយលើក",
+men:"ប្រុស",women:"ស្រី",kids:"កូនក្មេង",guestsL:"ចំនួនភ្ញៀវ",needG:"សូមជ្រើសរើសចំនួនភ្ញៀវ",gMen:"ប្រុស (នាក់)",gWomen:"ស្រី (នាក់)",gKids:"កូនក្មេង (នាក់)",
+amtL:"តម្លៃសរុបដែលយក ($) — ទុកទទេ = តម្លៃដើម",sumL:"សរុប",billStd:"តម្លៃដើម",billT:"គិតលុយ និងចាកចេញ",billAmt:"តម្លៃសរុបដែលទទួលបាន ($)",billHint:"អាចប្តូរបាន ប្រសិនបើយកខុសពីតម្លៃដើម",billOk:"ទទួលលុយ & ចាកចេញ",payOut:"គិតលុយ & ចាកចេញ",
+hType:"ប្រភេទ",hAmt:"ទឹកប្រាក់ ($)",hRev:"ចំណូល ($)",hHours:"ចំនួនម៉ោង",hCool:"ម៉ាស៊ីន/កង្ហារ",sToday:"ចំណូលថ្ងៃនេះ",sAll:"ចំណូលសរុប"},
 en:{codeT:"Enter access code",codeH:"This code keeps HENG HEAP data private. All staff use the same code to see the same data. Do not share it with anyone else.",codeL:"Access code (at least 8 letters a-z or numbers)",codeGo:"Enter",codeBad:"The code needs at least 8 characters (a-z or 0-9)",codeChg:"Change code",netOn:"Shared data (online)",netErr:"Cannot reach the database",netLocal:"Database not connected. Data stays on this device only.",netWait:"Connecting…",hist:"History",clearHist:"Clear all history",confirmClear:"Clear ALL history? This cannot be undone. Export to Excel first if you need a copy.",delFail:"Could not delete. Run the new SQL in heng-heap-setup.sql in Supabase.",histT:"Guest history",byDay:"By day",stays:"All stays",outNow:"Check out now",close:"Close",recorded:"Recorded",noHist:"No history yet. It appears once guests check in.",hInR:"Check-ins (rooms)",hInP:"Check-ins (people)",hInT:"Check-in times",hOutT:"Check-out times",title:"HENG HEAP Guest House",add:"Add room",export:"Export to Excel",prices:"Prices per night ($)",b2:"2 beds",b1:"1 bed",ac:"AC",fan:"Fan",all:"All",
 st_available:"Available",st_occupied:"Occupied",st_cleaning:"Needs cleaning",st_maintenance:"Maintenance",dbl:"Double rooms (2 beds)",sgl:"Single rooms (1 bed)",room:"Room",roomNo:"Room number",beds:"Beds",
 cool:"AC or fan",status:"Status",capL:"Max people",peopleL:"Guests staying",guest:"Guest name",cin:"Check in",cout:"Check out",cinNow:"Check in now",
 cinD:"Check-in date",cinT:"Check-in time",coD:"Check-out date",coT:"Check-out time",markReady:"Mark clean",edit:"Edit",del:"Delete",delRoom:"Delete room",save:"Save room",cancel:"Cancel",notes:"Notes",
-night:"night",ppl:"people",cap:"Capacity",rooms:"rooms",occ:"occupied",avail:"available",sRooms:"Rooms occupied",sGuests:"Guests in house",sNight:"Per night, occupied rooms",sTotal:"Total of all stays",
+night:"night",ppl:"people",cap:"Capacity",rooms:"rooms",occ:"occupied",avail:"available",sRooms:"Rooms occupied",sGuests:"Guests in house",sNight:"Per night, occupied rooms",sTotal:"In-house total",
 empty:"No rooms here. Pick another filter or add a room.",confirmDel:"Delete this room?",confirmOut:"Check out this room now?",over:"More guests than the room's capacity",newRoom:"New room",
 noXlsx:"Excel export could not load. Check your internet connection and reload the page.",noSave:"Saving files is not available in this view. Open the page in claude.ai.",saveFail:"Could not save the file.",
 hRoom:"Room",hBeds:"Beds",hGuest:"Guest",hPeople:"People",hNights:"Nights",hStatus:"Status",inHouse:"In house",out:"Checked out",hDate:"Date",hRoomsOcc:"Rooms occupied",
-hMonth:"Month",hCheckins:"Check-ins",hPeopleCI:"People checked in",hRoomNights:"Room-nights",hAvg:"Average rooms per day",shG:"Guests in-out",shD:"Per day",shM:"Per month"}};
+hMonth:"Month",hCheckins:"Check-ins",hPeopleCI:"People checked in",hRoomNights:"Room-nights",hAvg:"Average rooms per day",shG:"Guests in-out",shD:"Per day",shM:"Per month",view:"View detail",stayDur:"Duration",chargedL:"Amount charged",adjusted:"adjusted",
+hrMode:"Hourly rest",nightMode:"Overnight",stayType:"Stay type",hrsL:"Hours",hr:"hr",left:"Left",timeUp:"Time is up!",ok:"OK",untilT:"Until",
+hrPrices:"Hourly rest price ($ per session)",hhL:"Hours per session",
+men:"Men",women:"Women",kids:"Children",guestsL:"Guests",needG:"Please choose the number of guests",gMen:"Men",gWomen:"Women",gKids:"Children",
+amtL:"Total charged ($) — empty = standard price",sumL:"Total",billStd:"Standard price",billT:"Bill and check out",billAmt:"Amount received ($)",billHint:"You can change it if the amount differs from the standard price",billOk:"Receive & check out",payOut:"Bill & check out",
+hType:"Type",hAmt:"Amount ($)",hRev:"Revenue ($)",hHours:"Hours",hCool:"AC / Fan",sToday:"Revenue today",sAll:"Total revenue"}};
 const WD={km:["ថ្ងៃអាទិត្យ","ថ្ងៃច័ន្ទ","ថ្ងៃអង្គារ","ថ្ងៃពុធ","ថ្ងៃព្រហស្បតិ៍","ថ្ងៃសុក្រ","ថ្ងៃសៅរ៍"],en:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]};
 const MO={km:["មករា","កុម្ភៈ","មីនា","មេសា","ឧសភា","មិថុនា","កក្កដា","សីហា","កញ្ញា","តុលា","វិច្ឆិកា","ធ្នូ"],en:["January","February","March","April","May","June","July","August","September","October","November","December"]};
 const ST={available:"var(--free)",occupied:"var(--busy)",cleaning:"var(--clean)",maintenance:"var(--fix)"};
 const KEY="gh-rooms-v3",HKEY="gh-hist-v3",PKEY="gh-prices-v2",LKEY="gh-lang";
-const DEF={"2-ac":15,"2-fan":7.5,"1-ac":10,"1-fan":5};
+const DEF={"2-ac":15,"2-fan":7.5,"1-ac":10,"1-fan":5,"h-2-ac":7.5,"h-2-fan":7.5,"h-1-ac":7.5,"h-1-fan":7.5,"hh":3};
 let lang="km",prices={...DEF},rooms=[],hist=[],filter="all",editing=null;
 try{lang=localStorage.getItem(LKEY)||"km"}catch(e){}
 const SB_URL="https://qivndolqdzbxrodxybls.supabase.co",SB_KEY="sb_publishable_8FADCbCSClBO7j0yTcLxfA_kgku9lsQ";
@@ -215,9 +271,17 @@ const p2=n=>String(n).padStart(2,"0");
 const hm=d=>p2(d.getHours())+":"+p2(d.getMinutes());
 const ymd=d=>d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate());
 const pd=u=>{const[a,b,c]=u.split("-");return new Date(+a,b-1,+c)};
-const rate=r=>prices[r.beds+"-"+r.cool]||0;
+const rate=r=>+prices[r.beds+"-"+r.cool]||0;
+const hh=()=>+prices.hh||3;
+const hrate=r=>+prices["h-"+r.beds+"-"+r.cool]||0;
 const nights=r=>{if(!r.ci||!r.co)return 0;const d=Math.round((pd(r.co)-pd(r.ci))/864e5);return d>0?d:0};
-const total=r=>r.status=="occupied"?rate(r)*nights(r):0;
+const nightsB=r=>{if(!r.ci)return 0;const n=new Date(),end=r.co?pd(r.co):new Date(n.getFullYear(),n.getMonth(),n.getDate());return Math.max(1,Math.round((end-pd(r.ci))/864e5))};
+const hasOv=r=>r.amt!==undefined&&r.amt!==null&&r.amt!=="";
+const autoAmt=r=>r.mode=="hour"?hrate(r)*((+r.hrs||hh())/hh()):rate(r)*nightsB(r);
+const amtOf=r=>hasOv(r)?+r.amt:autoAmt(r);
+const total=r=>r.status=="occupied"?amtOf(r):0;
+const endMs=r=>+r.endAt||(r.co&&r.cot?new Date(r.co+"T"+r.cot).getTime():0);
+const fmtCd=ms=>{const a=Math.floor(Math.abs(ms)/1000),h=Math.floor(a/3600);return h+":"+p2(Math.floor(a%3600/60))+":"+p2(a%60)};
 const fmt=d=>{if(!d)return"";const x=pd(d);return x.getDate()+" "+MO[lang][x.getMonth()]};
 const byNum=(a,b)=>a.n.localeCompare(b.n,undefined,{numeric:true});
 
@@ -226,31 +290,43 @@ function tick(){
   $("clk").textContent=s;
   $("dte").textContent=lang=="km"?`${WD.km[d.getDay()]} ទី${d.getDate()} ខែ${MO.km[d.getMonth()]} ឆ្នាំ${d.getFullYear()}`:`${WD.en[d.getDay()]}, ${d.getDate()} ${MO.en[d.getMonth()]} ${d.getFullYear()}`;
   document.querySelectorAll(".clk").forEach(e=>e.textContent=s);
+  checkAlerts();
+  const nw=Date.now();
+  document.querySelectorAll(".cd").forEach(e=>{const ms=+e.dataset.end-nw,up=ms<=0,c=e.closest(".room");e.classList.toggle("up",up);if(c)c.classList.toggle("up",up);e.textContent=up?`⏰ ${t("timeUp")} +${fmtCd(ms)}`:`⏳ ${t("left")} ${fmtCd(ms)}`});
 }
 setInterval(tick,1000);
 
 $("s").innerHTML=Object.keys(ST).map(k=>`<option value="${k}" data-i18n="st_${k}"></option>`).join("");
 document.querySelectorAll("[data-p]").forEach(i=>{i.value=prices[i.dataset.p];i.oninput=()=>{prices[i.dataset.p]=+i.value||0;save();render()}});
 
+const gdesc=s=>[[s.m,"men"],[s.w,"women"],[s.c,"kids"]].filter(([n])=>+n>0).map(([n,k])=>`${t(k)} ${n}`).join(" · ");
 function tile(r){
-  const n=nights(r);let btn="";
-  if(r.status=="available")btn=`<button class="btn main" data-a="in" data-id="${r.id}">${t("cin")} <span class="clk"></span></button>`;
-  else if(r.status=="occupied")btn=`<button class="btn out main" data-a="out" data-id="${r.id}">${t("cout")} <span class="clk"></span></button>`;
+  const hr=r.mode=="hour",occ=r.status=="occupied",end=endMs(r);let btn="";
+  if(r.status=="available")btn=`<button class="btn main" data-a="in" data-id="${r.id}">${t("cin")} <span class="clk"></span></button><button class="btn ghost main" data-a="inh" data-id="${r.id}">⏱ ${t("hrMode")}</button>`;
+  else if(occ)btn=`<button class="btn out main" data-a="out" data-id="${r.id}">${t("payOut")} <span class="clk"></span></button>`;
   else if(r.status=="cleaning")btn=`<button class="btn main" data-a="ready" data-id="${r.id}">${t("markReady")}</button>`;
+  const gd=gdesc(r);
   return `<div class="room" style="--c:${ST[r.status]}"><div class="top"><span class="num">${t("room")} ${esc(r.n)}</span><span class="st">${t("st_"+r.status)}</span></div>
   <span class="type">${t("cap")} ${r.cap} ${t("ppl")} · ${r.cool=="ac"?t("ac"):t("fan")}</span>
-  <span class="price">${money(rate(r))} / ${t("night")}</span>
-  ${r.status=="occupied"?`<span class="guest">${esc(r.guest)||"—"} · ${r.people||0} ${t("ppl")}</span>
-  <span class="type">${t("cin")}: ${r.ci?fmt(r.ci)+" "+(r.cit||""):"—"}${r.co?` · ${t("cout")}: ${fmt(r.co)} ${r.cot||""}`:""}${n?` · ${n} ${t("night")} · ${money(total(r))}`:""}</span>`:""}
-  <div class="tools">${btn}<button class="btn ghost sm" data-a="edit" data-id="${r.id}">${t("edit")}</button></div></div>`;
+  <span class="price">${money(rate(r))} / ${t("night")} · ${money(hrate(r))} / ${hh()} ${t("hr")}</span>
+  ${occ?`<span class="guest">${esc(r.guest)||"—"} · ${r.people||0} ${t("ppl")}${gd?` (${esc(gd)})`:""}</span>
+  ${hr?`<span class="tag">⏱ ${t("hrMode")} · ${r.hrs||hh()} ${t("hr")}</span>${end?`<div class="cd" data-end="${end}"></div><span class="type">${t("untilT")} ${hm(new Date(end))}</span>`:""}`:""}
+  <span class="type">${t("cin")}: ${r.ci?fmt(r.ci)+" "+(r.cit||""):"—"}${!hr&&r.co?` · ${t("cout")}: ${fmt(r.co)} ${r.cot||""}`:""}${!hr&&r.ci?` · ${nightsB(r)} ${t("night")}`:""}</span>
+  <span class="amt">${t("sumL")}: ${money(total(r))}</span>`:""}
+  <div class="tools">${btn}<button class="btn ghost sm" data-a="view" data-id="${r.id}">${t("view")}</button><button class="btn ghost sm" data-a="edit" data-id="${r.id}">${t("edit")}</button></div></div>`;
+}
+const sumAmt=a=>a.reduce((x,s)=>x+(+s.amount||0),0);
+function revHtml(){const S=stays(),td=ymd(new Date());return `<div><b>${money(sumAmt(S.filter(s=>s.ci==td)))}</b><span>${t("sToday")}</span></div><div><b>${money(sumAmt(S))}</b><span>${t("sAll")}</span></div>`}
+function stays(){
+  return [...hist.map(h=>({...h,live:0})),...rooms.filter(r=>r.status=="occupied").map(r=>({n:r.n,beds:r.beds,cool:r.cool,mode:r.mode,hrs:r.hrs,guest:r.guest,people:r.people,m:r.m,w:r.w,c:r.c,notes:r.notes,ci:r.ci,cit:r.cit,co:r.co,cot:r.cot,amount:amtOf(r),live:1}))]
+    .sort((a,b)=>((a.ci||"")+(a.cit||"")).localeCompare((b.ci||"")+(b.cit||"")));
 }
 function render(){
   const cnt=k=>rooms.filter(r=>r.status==k).length,occ=rooms.filter(r=>r.status=="occupied");
   $("sum").textContent=`${rooms.length} ${t("rooms")} · ${occ.length} ${t("occ")} · ${cnt("available")} ${t("avail")}`;
   $("bar").innerHTML=`<div><b>${occ.length}/${rooms.length}</b><span>${t("sRooms")}</span></div>
   <div><b>${occ.reduce((a,r)=>a+(+r.people||0),0)}</b><span>${t("sGuests")}</span></div>
-  <div><b>${money(occ.reduce((a,r)=>a+rate(r),0))}</b><span>${t("sNight")}</span></div>
-  <div><b>${money(rooms.reduce((a,r)=>a+total(r),0))}</b><span>${t("sTotal")}</span></div>`;
+  <div><b>${money(rooms.reduce((a,r)=>a+total(r),0))}</b><span>${t("sTotal")}</span></div>${revHtml()}`;
   $("filters").innerHTML=[["all",t("all"),rooms.length],...Object.keys(ST).map(k=>[k,t("st_"+k),cnt(k)])]
     .map(([k,l,c])=>`<button class="chip" data-f="${k}" aria-pressed="${filter==k}">${k!="all"?`<span class="dot" style="background:${ST[k]}"></span>`:""}${l} ${c}</button>`).join("");
   [[2,"g2","h2","dbl"],[1,"g1","h1","sgl"]].forEach(([b,g,h,key])=>{
@@ -267,19 +343,47 @@ function applyLang(){
 }
 $("lang").onclick=()=>{lang=lang=="km"?"en":"km";try{localStorage.setItem(LKEY,lang)}catch(e){}applyLang()};
 
-function openDlg(id,inNow){
-  editing=id;const now=new Date();
+let dEnd=null,prevMode="night";
+const fillCnt=(id,v)=>{const mx=Math.max(4,+v||0);$(id).innerHTML=Array.from({length:mx+1},(_,i)=>`<option value="${i}">${i}</option>`).join("");$(id).value=+v||0};
+function openDlg(id,inNow,mode){
+  editing=id;const now=new Date();dEnd=null;
   const r={...(rooms.find(x=>x.id==id)||{n:"",beds:1,cap:2,cool:"fan",status:"available",guest:"",people:0,ci:"",cit:"",co:"",cot:"",notes:""})};
-  if(inNow)Object.assign(r,{status:"occupied",ci:ymd(now),cit:hm(now),people:r.people||1});
+  r.mode=r.mode||"night";r.hrs=r.hrs||hh();
+  if(!(+r.m||+r.w||+r.c)&&+r.people>0)r.m=+r.people;
+  if(inNow){
+    Object.assign(r,{status:"occupied",ci:ymd(now),cit:hm(now),mode:mode||"night",hrs:hh(),amt:"",co:"",cot:""});
+    if(r.mode=="hour"){const e=new Date(now.getTime()+r.hrs*36e5);r.co=ymd(e);r.cot=hm(e);dEnd=e.getTime()}
+  }else if(r.mode=="hour")dEnd=+r.endAt||null;
   $("dt").textContent=id?`${t("room")} ${r.n}`:t("newRoom");
-  [["n","n"],["b","beds"],["cp","cap"],["c","cool"],["s","status"],["p","people"],["g","guest"],["ci","ci"],["cit","cit"],["co","co"],["cot","cot"],["no","notes"]].forEach(([i,k])=>$(i).value=r[k]??"");
+  [["n","n"],["b","beds"],["cp","cap"],["c","cool"],["s","status"],["g","guest"],["ci","ci"],["cit","cit"],["co","co"],["cot","cot"],["no","notes"],["md","mode"],["hrs","hrs"],["am","amt"]].forEach(([i,k])=>$(i).value=r[k]??"");
+  fillCnt("m",r.m);fillCnt("w",r.w);fillCnt("k",r.c);
+  $("hrsW").style.display=r.mode=="hour"?"":"none";prevMode=r.mode;
   const sr=rooms.find(x=>x.id==id);$("outNow").style.display=sr&&sr.status=="occupied"?"":"none";$("delRm").style.display=sr?"":"none";est();tick();$("dlg").showModal();
 }
-const cur=()=>({beds:+$("b").value,cool:$("c").value,ci:$("ci").value,co:$("co").value});
-function est(){const r=cur(),n=nights(r),p=rate(r);$("est").textContent=money(p)+" / "+t("night")+(n?` · ${n} ${t("night")} · ${money(n*p)}`:"");chk()}
-function chk(){$("p").setCustomValidity(+$("p").value>+$("cp").value?t("over"):"")}
-["b","c","ci","co","p","cp"].forEach(i=>$(i).addEventListener("input",est));
-$("cinNow").onclick=()=>{const d=new Date();$("s").value="occupied";$("ci").value=ymd(d);$("cit").value=hm(d);if(!+$("p").value)$("p").value=1;est();$("g").focus()};
+const cur=()=>({beds:+$("b").value,cool:$("c").value,ci:$("ci").value,co:$("co").value,mode:$("md").value,hrs:+$("hrs").value||hh(),amt:$("am").value,status:"occupied"});
+const gt=()=>(+$("m").value||0)+(+$("w").value||0)+(+$("k").value||0);
+function est(){
+  const r=cur(),rr=r.ci?r:{...r,ci:ymd(new Date())},a=autoAmt(rr),ov=hasOv(r),f=ov?+r.amt:a,hr=r.mode=="hour";
+  const d=hr?`${money(hrate(r))} / ${hh()} ${t("hr")} · ${r.hrs} ${t("hr")}`:`${money(rate(r))} / ${t("night")} · ${nightsB(rr)} ${t("night")}`;
+  $("am").placeholder=money(a);
+  $("est").innerHTML=`<div class="type">${esc(d)}</div><div class="tot">${t("sumL")}: ${money(f)}${ov&&f!==a?` <small class="type">(${t("billStd")} ${money(a)})</small>`:""}</div>`;
+  chk();
+}
+function chk(){const g=gt();$("m").setCustomValidity(g>(+$("cp").value||0)?t("over"):($("s").value=="occupied"&&!g)?t("needG"):"");$("ptot").textContent=`${t("guestsL")}: ${g} ${t("ppl")}`}
+function autoEnd(){
+  if($("md").value!="hour")return;const ci=$("ci").value,ct=$("cit").value;if(!ci||!ct)return;
+  const e=dEnd?new Date(dEnd):new Date(new Date(ci+"T"+ct).getTime()+(+$("hrs").value||hh())*36e5);
+  $("co").value=ymd(e);$("cot").value=hm(e);
+}
+$("md").addEventListener("input",()=>{const h=$("md").value=="hour";$("hrsW").style.display=h?"":"none";if(!h&&prevMode=="hour"){$("co").value="";$("cot").value=""}prevMode=$("md").value});
+["md","hrs","ci","cit"].forEach(i=>$(i).addEventListener("input",()=>{dEnd=null;autoEnd()}));
+["co","cot"].forEach(i=>$(i).addEventListener("input",()=>{dEnd=null}));
+["b","c","ci","cit","co","cot","m","w","k","cp","s","md","hrs","am"].forEach(i=>$(i).addEventListener("input",est));
+$("cinNow").onclick=()=>{
+  const d=new Date();$("s").value="occupied";$("ci").value=ymd(d);$("cit").value=hm(d);dEnd=null;
+  if($("md").value=="hour"){const e=new Date(d.getTime()+(+$("hrs").value||hh())*36e5);$("co").value=ymd(e);$("cot").value=hm(e);dEnd=e.getTime()}
+  est();$("g").focus();
+};
 $("add").onclick=()=>openDlg(null);
 $("cx").onclick=$("x").onclick=()=>$("dlg").close();
 function remote(fn,body){if(!useDb)return;busy++;lastSave=Date.now();rpc(fn,{p_code:CODE,...body}).then(()=>net("on")).catch(()=>{net("err");alert(t("delFail"))}).finally(()=>{busy--;lastSave=Date.now();lastSig=""})}
@@ -294,36 +398,102 @@ $("clrH").onclick=()=>{
   hist=[];synced.hist={};save();remote("gh_clear_hist",{});renderHist();
 };
 
-function logStay(s){const ci=s.ci||s.co;if(!ci)return;hist.push({id:"h"+Date.now()+Math.random().toString(36).slice(2,6),n:s.n,beds:s.beds,guest:s.guest,people:s.people,notes:s.notes||"",ci,cit:s.ci?s.cit:s.cot,co:s.co,cot:s.cot})}
-const clear={guest:"",people:0,ci:"",cit:"",co:"",cot:""};
+function logStay(s){const ci=s.ci||s.co;if(!ci)return;hist.push({id:"h"+Date.now()+Math.random().toString(36).slice(2,6),n:s.n,beds:s.beds,cool:s.cool,mode:s.mode||"night",hrs:s.mode=="hour"?(s.hrs||hh()):0,guest:s.guest,people:s.people,m:+s.m||0,w:+s.w||0,c:+s.c||0,amount:amtOf({...s,ci}),notes:s.notes||"",ci,cit:s.ci?s.cit:s.cot,co:s.co,cot:s.cot})}
+const clear={guest:"",people:0,m:0,w:0,c:0,mode:"night",hrs:0,amt:"",endAt:null,ci:"",cit:"",co:"",cot:""};
 let tt;function toast(m){const e=$("toast");e.textContent=m;e.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>e.classList.remove("show"),4500)}
-function checkout(r){const d=new Date();logStay({...r,co:ymd(d),cot:hm(d)});Object.assign(r,clear,{status:"cleaning"});save();render();toast(`✓ ${t("recorded")}: ${t("room")} ${r.n} · ${t("cout")} ${fmt(ymd(d))} ${hm(d)}`)}
-$("outNow").onclick=()=>{const r=rooms.find(x=>x.id==editing);if(r&&r.status=="occupied"&&confirm(t("confirmOut"))){$("dlg").close();checkout(r)}};
+function checkout(r){const d=new Date();r.co=ymd(d);r.cot=hm(d);const a=amtOf(r),n=r.n;logStay({...r});Object.assign(r,clear,{status:"cleaning"});save();render();toast(`✓ ${t("recorded")}: ${t("room")} ${n} · ${t("cout")} ${fmt(ymd(d))} ${hm(d)} · ${money(a)}`)}
+let billing=null;
+const stayDesc=s=>s.mode=="hour"?`⏱ ${t("hrMode")} · ${s.hrs||hh()} ${t("hr")} · ${fmt(s.ci)} ${s.cit||""}`:`${fmt(s.ci)} ${s.cit||""} → ${fmt(s.co)} ${s.cot||""} · ${nightsB(s)} ${t("night")} × ${money(rate(s))}`;
+function openBill(r){
+  const d=new Date(),tmp={...r,co:ymd(d),cot:hm(d)},a=autoAmt(tmp);billing=r.id;
+  $("binfo").innerHTML=`<div><b>${t("room")} ${esc(r.n)}</b> · ${esc(r.guest)||"—"} · ${r.people||0} ${t("ppl")}</div><div class="type">${esc(stayDesc(tmp))}</div><div class="type">${t("billStd")}: <b>${money(a)}</b></div>`;
+  $("bam").value=hasOv(r)?r.amt:a;$("bdlg").showModal();$("bam").select();
+}
+$("bx").onclick=$("bc").onclick=()=>$("bdlg").close();
+$("bf").onsubmit=()=>{const r=rooms.find(x=>x.id==billing);if(!r)return;r.amt=Math.max(0,+$("bam").value||0);checkout(r)};
+$("outNow").onclick=()=>{const r=rooms.find(x=>x.id==editing);if(r&&r.status=="occupied"){$("dlg").close();openBill(r)}};
 document.querySelector("main").addEventListener("click",e=>{
   const f=e.target.closest("[data-f]");if(f){filter=f.dataset.f;render();return}
   const b=e.target.closest("[data-a]");if(!b)return;
   const r=rooms.find(x=>x.id==b.dataset.id),a=b.dataset.a;
   if(a=="edit")openDlg(r.id);
-  else if(a=="in")openDlg(r.id,true);
+  else if(a=="view")openView(r.id);
+  else if(a=="in")openDlg(r.id,true,"night");
+  else if(a=="inh")openDlg(r.id,true,"hour");
   else if(a=="ready"){r.status="available";save();render()}
-  else if(a=="out"&&confirm(t("confirmOut")))checkout(r);
+  else if(a=="out")openBill(r);
 });
 $("f").onsubmit=()=>{
-  const d={n:$("n").value.trim(),beds:+$("b").value,cap:+$("cp").value||1,cool:$("c").value,status:$("s").value,guest:$("g").value.trim(),people:+$("p").value||0,ci:$("ci").value,cit:$("cit").value,co:$("co").value,cot:$("cot").value,notes:$("no").value.trim()};
+  const hr=$("md").value=="hour";
+  const d={n:$("n").value.trim(),beds:+$("b").value,cap:+$("cp").value||1,cool:$("c").value,status:$("s").value,guest:$("g").value.trim(),people:gt(),m:+$("m").value||0,w:+$("w").value||0,c:+$("k").value||0,mode:$("md").value,hrs:+$("hrs").value||hh(),amt:$("am").value===""?"":Math.max(0,+$("am").value||0),ci:$("ci").value,cit:$("cit").value,co:$("co").value,cot:$("cot").value,notes:$("no").value.trim()};
+  d.endAt=hr&&d.status=="occupied"?(dEnd||(d.co&&d.cot?new Date(d.co+"T"+d.cot).getTime():null)):null;
   const old=rooms.find(x=>x.id==editing),now=new Date();
-  if(old&&old.status=="occupied"&&d.status!="occupied")logStay({...old,notes:d.notes,co:d.co||old.co||ymd(now),cot:d.cot||old.cot||hm(now)});
+  if(old&&old.status=="occupied"&&d.status!="occupied")logStay({...old,notes:d.notes,amt:d.amt,co:d.co||old.co||ymd(now),cot:d.cot||old.cot||hm(now)});
   if(d.status!="occupied")Object.assign(d,clear);
   if(old)Object.assign(old,d);else rooms.push({id:"r"+Date.now(),...d});
   rooms.sort(byNum);save();render();
 };
+
+// ---- view detail ----
+let viewing=null;
+function openView(id){
+  const r=rooms.find(x=>x.id==id);if(!r)return;viewing=id;
+  const occ=r.status=="occupied",hr=r.mode=="hour",end=endMs(r),row=(k,v)=>`<tr><th>${esc(k)}</th><td>${v}</td></tr>`;
+  let h=row(t("room"),esc(r.n))+row(t("status"),t("st_"+r.status))+row(t("hBeds"),r.beds)+row(t("cool"),r.cool=="ac"?t("ac"):t("fan"))+row(t("capL"),r.cap)
+    +row(t("billStd"),`${money(rate(r))} / ${t("night")} · ${money(hrate(r))} / ${hh()} ${t("hr")}`);
+  if(occ){
+    const gd=gdesc(r);
+    h+=row(t("guest"),esc(r.guest)||"—")+row(t("guestsL"),`${r.people||0} ${t("ppl")}${gd?` (${esc(gd)})`:""}`)
+      +row(t("stayType"),hr?t("hrMode"):t("nightMode"))
+      +row(t("cin"),r.ci?esc(fy(r.ci)+" "+(r.cit||"")):"—")
+      +row(hr?t("untilT"):t("cout"),hr?(end?esc(hm(new Date(end))):"—"):(r.co?esc(fy(r.co)+" "+(r.cot||"")):"—"));
+    if(hr&&end)h+=row(t("left"),`<span class="cd" data-end="${end}"></span>`);
+    h+=row(t("stayDur"),esc(hr?`${r.hrs||hh()} ${t("hr")}`:`${nightsB(r)} ${t("night")}`))
+      +row(t("billStd"),money(autoAmt(r)))
+      +row(t("chargedL"),`<b class="amt">${money(total(r))}</b>${hasOv(r)&&+r.amt!==autoAmt(r)?` <span class="type">(${t("adjusted")})</span>`:""}`)
+      +row(t("notes"),esc(r.notes)||"—");
+  }
+  $("vt").textContent=`${t("room")} ${r.n}`;
+  $("vbody").innerHTML=`<table>${h}</table>`;
+  $("vbill").style.display=occ?"":"none";
+  $("vdlg").showModal();tick();
+}
+$("vx").onclick=$("vcl").onclick=()=>$("vdlg").close();
+$("vedit").onclick=()=>{$("vdlg").close();openDlg(viewing)};
+$("vbill").onclick=()=>{const r=rooms.find(x=>x.id==viewing);if(r){$("vdlg").close();openBill(r)}};
+
+// ---- time-up alert (hourly rest) ----
+let acked={},beepT=null,asig="",actx=null;
+try{acked=JSON.parse(localStorage.getItem("gh-ack")||"{}")}catch(e){}
+const ackK=r=>r.id+"|"+endMs(r);
+const expired=()=>{const n=Date.now();return rooms.filter(r=>r.status=="occupied"&&r.mode=="hour"&&endMs(r)&&endMs(r)<=n&&!acked[ackK(r)])};
+function ack(rs){rs.forEach(r=>acked[ackK(r)]=1);try{localStorage.setItem("gh-ack",JSON.stringify(acked))}catch(e){}}
+document.addEventListener("pointerdown",()=>{try{actx=actx||new(window.AudioContext||window.webkitAudioContext)();if(actx.state=="suspended")actx.resume()}catch(e){}});
+function beep(){
+  try{if(actx){[0,.25,.5].forEach(d=>{const o=actx.createOscillator(),g=actx.createGain(),st=actx.currentTime+d;o.frequency.value=880;o.connect(g);g.connect(actx.destination);g.gain.setValueAtTime(.0001,st);g.gain.exponentialRampToValueAtTime(.4,st+.02);g.gain.exponentialRampToValueAtTime(.0001,st+.2);o.start(st);o.stop(st+.22)})}}catch(e){}
+  try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(e){}
+}
+function renderAlert(ex){
+  $("alist").innerHTML=ex.map(r=>`<div class="arow"><div><b>${t("room")} ${esc(r.n)}</b>${r.guest?" · "+esc(r.guest):""}<div class="type">${t("untilT")} ${hm(new Date(endMs(r)))}</div><div class="cd" data-end="${endMs(r)}"></div></div><button type="button" class="btn out sm" data-bill="${r.id}">${t("payOut")}</button></div>`).join("");
+}
+function checkAlerts(){
+  const ex=expired(),dlg=$("adlg");
+  if(!ex.length){if(dlg.open)dlg.close();return}
+  const sig=ex.map(r=>r.id).join(),was=dlg.open;
+  if(sig!==asig||!was){asig=sig;renderAlert(ex)}
+  if(!was){dlg.showModal();beep();beepT=setInterval(beep,3000)}
+}
+$("adlg").addEventListener("cancel",e=>e.preventDefault());
+$("adlg").addEventListener("close",()=>{clearInterval(beepT);beepT=null;asig=""});
+$("aok").onclick=()=>{ack(expired());$("adlg").close()};
+$("alist").onclick=e=>{const b=e.target.closest("[data-bill]");if(!b)return;const r=rooms.find(x=>x.id==b.dataset.bill);if(r){ack([r]);$("adlg").close();openBill(r)}};
 
 const ev=(s,tm)=>`${t("room")} ${s.n}${s.guest?" · "+s.guest:""} · ${tm||"—"}${s.notes?" ("+s.notes+")":""}`;
 const fy=d=>d?fmt(d)+" "+d.slice(0,4):"—";
 const tot=(a,f)=>a.reduce((x,s)=>x+(+f(s)||0),0);
 function calc(){
   const now=new Date(),today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
-  const all=[...hist.map(h=>({...h,live:0})),...rooms.filter(r=>r.status=="occupied").map(r=>({n:r.n,beds:r.beds,guest:r.guest,people:r.people,notes:r.notes,ci:r.ci,cit:r.cit,co:r.co,cot:r.cot,live:1}))]
-    .sort((a,b)=>(a.ci+a.cit).localeCompare(b.ci+b.cit));
+  const all=stays();
   const map={},slot=k=>map[k]=map[k]||{r:0,p:0,ins:[],outs:[]};let lo=null,hi=null;
   const span=(a,e)=>{if(!lo||a<lo)lo=a;if(!hi||e>hi)hi=e};
   all.filter(s=>s.ci).forEach(s=>{
@@ -338,15 +508,18 @@ function calc(){
   if(lo)for(let d=new Date(lo);d<=hi;d.setDate(d.getDate()+1)){const k=ymd(d);days.push({k,...slot(k)})}
   return{all,days};
 }
-const dayRow=(d,j)=>[d.k,d.r,d.p,d.ins.length,tot(d.ins,s=>s.people),d.ins.map(s=>ev(s,s.cit)).join(j),d.outs.map(s=>ev(s,s.cot)).join(j)];
+const dayRow=(d,j)=>[d.k,d.r,d.p,d.ins.length,tot(d.ins,s=>s.people),tot(d.ins,s=>s.amount),d.ins.map(s=>ev(s,s.cit)).join(j),d.outs.map(s=>ev(s,s.cot)).join(j)];
 const table=(h,rows)=>`<div class="tw"><table><thead><tr>${h.map(x=>`<th>${esc(x)}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${esc(c).replace(/\n/g,"<br>")}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+const typeL=s=>s.mode=="hour"?t("hrMode"):t("nightMode");
+const durL=s=>s.mode=="hour"?`${s.hrs||hh()} ${t("hr")}`:`${s.ci?nightsB(s):0} ${t("night")}`;
 let ht="day";
 function renderHist(){
   const{all,days}=calc();
+  $("hsum").innerHTML=revHtml();
   $("htabs").innerHTML=[["day","byDay"],["stays","stays"]].map(([k,l])=>`<button class="chip" data-h="${k}" aria-pressed="${ht==k}">${t(l)}</button>`).join("");
   $("hbody").innerHTML=!all.length?`<div class="empty" style="margin-top:12px">${t("noHist")}</div>`:ht=="day"
-    ?table([t("hDate"),t("hRoomsOcc"),t("hPeople"),t("hInR"),t("hInP"),t("hInT"),t("hOutT")],days.slice().reverse().map(d=>{const r=dayRow(d,"\n");r[0]=fy(d.k);return r}))
-    :table([t("hRoom"),t("hGuest"),t("hPeople"),t("cin"),t("cout"),t("hNights"),t("hStatus"),t("notes")],all.slice().reverse().map(s=>[s.n,s.guest||"—",+s.people||0,s.ci?fy(s.ci)+" "+(s.cit||""):"—",s.co?fy(s.co)+" "+(s.cot||""):"—",nights(s),s.live?t("inHouse"):t("out"),s.notes||""]));
+    ?table([t("hDate"),t("hRoomsOcc"),t("hPeople"),t("hInR"),t("hInP"),t("hRev"),t("hInT"),t("hOutT")],days.slice().reverse().map(d=>{const r=dayRow(d,"\n");r[0]=fy(d.k);r[5]=money(r[5]);return r}))
+    :table([t("hRoom"),t("hGuest"),t("hType"),t("hPeople"),t("cin"),t("cout"),t("hNights"),t("hAmt"),t("hStatus"),t("notes")],all.slice().reverse().map(s=>[s.n,s.guest||"—",typeL(s),(+s.people||0)+(gdesc(s)?` (${gdesc(s)})`:""),s.ci?fy(s.ci)+" "+(s.cit||""):"—",s.co?fy(s.co)+" "+(s.cot||""):"—",durL(s),s.amount!=null?money(s.amount):"—",s.live?t("inHouse"):t("out"),s.notes||""]));
 }
 $("hbtn").onclick=()=>{renderHist();$("hdlg").showModal()};
 $("htabs").onclick=e=>{const b=e.target.closest("[data-h]");if(b){ht=b.dataset.h;renderHist()}};
@@ -357,16 +530,17 @@ $("xl").onclick=async()=>{
   if(!window.XLSX){alert(t("noXlsx"));return}
   let dl=null;try{dl=await claude.use("downloads")}catch(e){}
   const now=new Date(),{all,days}=calc();
-  const g=[[t("hRoom"),t("hBeds"),t("hGuest"),t("hPeople"),t("cinD"),t("cinT"),t("coD"),t("coT"),t("hNights"),t("hStatus"),t("notes")]];
-  all.forEach(s=>g.push([s.n,s.beds,s.guest,+s.people||0,s.ci,s.cit,s.co,s.cot,nights(s),s.live?t("inHouse"):t("out"),s.notes||""]));
-  const dd=[[t("hDate"),t("hRoomsOcc"),t("hPeople"),t("hInR"),t("hInP"),t("hInT"),t("hOutT")],...days.map(d=>dayRow(d,"; "))];
-  const mm={},mk=k=>mm[k]=mm[k]||{c:0,p:0,rn:0};
+  const g=[[t("hRoom"),t("hBeds"),t("hCool"),t("hType"),t("hGuest"),t("hPeople"),t("men"),t("women"),t("kids"),t("cinD"),t("cinT"),t("coD"),t("coT"),t("hNights"),t("hHours"),t("hAmt"),t("hStatus"),t("notes")]];
+  all.forEach(s=>g.push([s.n,s.beds,s.cool?(s.cool=="ac"?t("ac"):t("fan")):"",typeL(s),s.guest,+s.people||0,+s.m||0,+s.w||0,+s.c||0,s.ci,s.cit,s.co,s.cot,s.mode=="hour"?0:(s.ci?nightsB(s):0),s.mode=="hour"?(s.hrs||hh()):0,+s.amount||0,s.live?t("inHouse"):t("out"),s.notes||""]));
+  const trow=Array(18).fill("");trow[14]=t("sumL");trow[15]=tot(all,s=>s.amount);g.push(trow);
+  const dd=[[t("hDate"),t("hRoomsOcc"),t("hPeople"),t("hInR"),t("hInP"),t("hRev"),t("hInT"),t("hOutT")],...days.map(d=>dayRow(d,"; "))];
+  const mm={},mk=k=>mm[k]=mm[k]||{c:0,p:0,rn:0,rev:0};
   days.forEach(d=>{mk(d.k.slice(0,7)).rn+=d.r});
-  all.filter(s=>s.ci).forEach(s=>{const x=mk(s.ci.slice(0,7));x.c++;x.p+=+s.people||0});
-  const mo=[[t("hMonth"),t("hCheckins"),t("hPeopleCI"),t("hRoomNights"),t("hAvg")]];
-  Object.keys(mm).sort().forEach(k=>{const[y,m]=k.split("-"),x=mm[k],n=new Date(+y,+m,0).getDate();mo.push([k,x.c,x.p,x.rn,Math.round(x.rn/n*10)/10])});
+  all.filter(s=>s.ci).forEach(s=>{const x=mk(s.ci.slice(0,7));x.c++;x.p+=+s.people||0;x.rev+=+s.amount||0});
+  const mo=[[t("hMonth"),t("hCheckins"),t("hPeopleCI"),t("hRoomNights"),t("hAvg"),t("hRev")]];
+  Object.keys(mm).sort().forEach(k=>{const[y,m]=k.split("-"),x=mm[k],n=new Date(+y,+m,0).getDate();mo.push([k,x.c,x.p,x.rn,Math.round(x.rn/n*10)/10,x.rev])});
   const wb=XLSX.utils.book_new();
-  [[g,t("shG"),[8,6,20,10,12,10,12,10,8,14,40]],[dd,t("shD"),[14,18,14,16,16,60,60]],[mo,t("shM"),[10,16,18,16,22]]].forEach(([rows,name,w])=>{
+  [[g,t("shG"),[8,6,14,14,20,10,8,8,8,12,10,12,10,8,8,12,14,40]],[dd,t("shD"),[14,18,14,16,16,14,60,60]],[mo,t("shM"),[10,16,18,16,22,14]]].forEach(([rows,name,w])=>{
     const ws=XLSX.utils.aoa_to_sheet(rows);ws["!cols"]=w.map(x=>({wch:x}));XLSX.utils.book_append_sheet(wb,ws,name);
   });
   const buf=XLSX.write(wb,{type:"array",bookType:"xlsx"});
