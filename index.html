@@ -155,18 +155,21 @@ dialog.alert{border:3px solid var(--fix)}
 <dialog id="dlg">
   <div class="dh"><h2 id="dt"></h2><button type="button" class="x" id="x">✕</button></div>
   <form method="dialog" id="f" class="db">
+    <div id="gRoom">
     <div class="row">
       <label><span data-i18n="roomNo"></span><input id="n" required></label>
       <label><span data-i18n="beds"></span><select id="b"><option value="1" data-i18n="b1"></option><option value="2" data-i18n="b2"></option></select></label>
     </div>
-    <div class="row">
+    <div>
       <label><span data-i18n="capL"></span><input id="cp" type="number" min="1" max="30" required></label>
-      <label><span data-i18n="cool"></span><select id="c"><option value="ac" data-i18n="ac"></option><option value="fan" data-i18n="fan"></option></select></label>
+    </div>
     </div>
     <div class="row">
-      <label><span data-i18n="status"></span><select id="s"></select></label>
-      <label><span data-i18n="stayType"></span><select id="md"><option value="night" data-i18n="nightMode"></option><option value="hour" data-i18n="hrMode"></option></select></label>
+      <label id="stW"><span data-i18n="status"></span><select id="s"></select></label>
+      <label id="mdW"><span data-i18n="stayType"></span><select id="md"><option value="night" data-i18n="nightMode"></option><option value="hour" data-i18n="hrMode"></option></select></label>
     </div>
+    <div id="gStay">
+    <label><span data-i18n="cool"></span><select id="c"><option value="ac" data-i18n="ac"></option><option value="fan" data-i18n="fan"></option></select></label>
     <label id="hrsW" style="display:none"><span data-i18n="hrsL"></span><input id="hrs" type="number" min="0.5" step="0.5"></label>
     <div class="row3">
       <label><span data-i18n="gMen"></span><select id="m"></select></label>
@@ -193,6 +196,7 @@ dialog.alert{border:3px solid var(--fix)}
     <label id="ppW" style="display:none"><span data-i18n="prepL"></span><input id="pp" type="number" min="0" step="0.5" inputmode="decimal"></label>
     <div class="nowrow" id="qrRow" style="display:none"><button type="button" class="btn ghost sm" id="qrBtn" data-i18n="showQr"></button></div>
     <div class="est" id="est"></div>
+    </div>
     <div class="actions">
       <button type="button" class="btn ghost" id="delRm" data-i18n="delRoom" style="margin-right:auto;color:#c0392b"></button>
       <button type="button" class="btn ghost" id="cx" data-i18n="cancel"></button>
@@ -255,7 +259,7 @@ hrMode:"សម្រាកម៉ោង",nightMode:"ស្នាក់យប់",
 hrPrices:"តម្លៃសម្រាកម៉ោង ($ ក្នុងមួយលើក)",hhL:"ចំនួនម៉ោងក្នុងមួយលើក",
 men:"ប្រុស",women:"ស្រី",kids:"កូនក្មេង",guestsL:"ចំនួនភ្ញៀវ",needG:"សូមជ្រើសរើសចំនួនភ្ញៀវ",gMen:"ប្រុស (នាក់)",gWomen:"ស្រី (នាក់)",gKids:"កូនក្មេង (នាក់)",
 amtL:"តម្លៃសរុបដែលយក ($) — ទុកទទេ = តម្លៃដើម",sumL:"សរុប",billStd:"តម្លៃដើម",billT:"គិតលុយ និងចាកចេញ",billAmt:"តម្លៃសរុបនៃការស្នាក់ ($)",billHint:"អាចប្តូរបាន ប្រសិនបើយកខុសពីតម្លៃដើម",billOk:"ទទួលលុយ & ចាកចេញ",payOut:"គិតលុយ & ចាកចេញ",
-hType:"ប្រភេទ",hAmt:"ទឹកប្រាក់ ($)",hRev:"ចំណូល ($)",hHours:"ចំនួនម៉ោង",hCool:"ម៉ាស៊ីន/កង្ហារ",sToday:"ចំណូលថ្ងៃនេះ",sAll:"ចំណូលសរុប",payT:"ការបង់ប្រាក់",pRoom:"ប្រភេទបន្ទប់",pNight:"ក្នុងមួយយប់ ($)",pHour:"សម្រាកម៉ោង ($ ក្នុងមួយលើក)",calT:"ប្រតិទិន",todayB:"ថ្ងៃនេះ",sIn:"ចូលស្នាក់",sOut:"ចាកចេញ",sStay:"កំពុងស្នាក់",search:"ស្វែងរកលេខបន្ទប់ ឬឈ្មោះភ្ញៀវ",stayCnt:"ការស្នាក់",monthRev:"ចំណូលខែនេះ",dayEmpty:"ថ្ងៃនេះមិនមានភ្ញៀវទេ។",pickDay:"ចុចលើថ្ងៃណាមួយ ដើម្បីមើលភ្ញៀវ",paidVia:"បង់ប្រាក់រួចតាម",payWhen:"ពេលបង់ប្រាក់",payIn:"បង់ពេលចូលស្នាក់",payOutT:"បង់ពេលចាកចេញ",payMeth:"វិធីបង់ប្រាក់",cash:"សាច់ប្រាក់",aba:"ABA (ស្កេន QR)",prepL:"ទឹកប្រាក់បានបង់ជាមុន ($)",prepD:"បានបង់ជាមុន",balD:"នៅសល់",dueNow:"ត្រូវទទួលពីភ្ញៀវ",refundD:"ត្រូវសងភ្ញៀវវិញ",payDone:"បានបង់គ្រប់ហើយ",showQr:"បង្ហាញ QR ABA",qrT:"ស្កេនបង់ប្រាក់តាម ABA",qrNone:"មិនទាន់មានរូប QR ទេ។ សូមបញ្ចូលរូប QR ABA នៅក្នុងផ្នែក «តម្លៃក្នុងមួយយប់» នៅលើទំព័រដើម។",qrUp:"រូប QR ABA របស់ផ្ទះសំណាក់ (សម្រាប់ឲ្យភ្ញៀវស្កេន)",qrDel:"លុបរូប QR",qrSaved:"បានរក្សាទុករូប QR",hPrepA:"បង់ជាមុន ($)",hPrepM:"វិធីបង់ជាមុន",hBalA:"បង់ពេលចេញ ($)",hBalM:"វិធីបង់ពេលចេញ",hCash:"សាច់ប្រាក់ ($)",hAba:"ABA ($)",rcvCashT:"សាច់ប្រាក់ទទួលថ្ងៃនេះ",rcvAbaT:"ABA ទទួលថ្ងៃនេះ",rcvCashA:"សាច់ប្រាក់ទទួលសរុប",rcvAbaA:"ABA ទទួលសរុប"},
+hType:"ប្រភេទ",hAmt:"ទឹកប្រាក់ ($)",hRev:"ចំណូល ($)",hHours:"ចំនួនម៉ោង",hCool:"ម៉ាស៊ីន/កង្ហារ",sToday:"ចំណូលថ្ងៃនេះ",sAll:"ចំណូលសរុប",payT:"ការបង់ប្រាក់",editStay:"កែការស្នាក់",pRoom:"ប្រភេទបន្ទប់",pNight:"ក្នុងមួយយប់ ($)",pHour:"សម្រាកម៉ោង ($ ក្នុងមួយលើក)",calT:"ប្រតិទិន",todayB:"ថ្ងៃនេះ",sIn:"ចូលស្នាក់",sOut:"ចាកចេញ",sStay:"កំពុងស្នាក់",search:"ស្វែងរកលេខបន្ទប់ ឬឈ្មោះភ្ញៀវ",stayCnt:"ការស្នាក់",monthRev:"ចំណូលខែនេះ",dayEmpty:"ថ្ងៃនេះមិនមានភ្ញៀវទេ។",pickDay:"ចុចលើថ្ងៃណាមួយ ដើម្បីមើលភ្ញៀវ",paidVia:"បង់ប្រាក់រួចតាម",payWhen:"ពេលបង់ប្រាក់",payIn:"បង់ពេលចូលស្នាក់",payOutT:"បង់ពេលចាកចេញ",payMeth:"វិធីបង់ប្រាក់",cash:"សាច់ប្រាក់",aba:"ABA (ស្កេន QR)",prepL:"ទឹកប្រាក់បានបង់ជាមុន ($)",prepD:"បានបង់ជាមុន",balD:"នៅសល់",dueNow:"ត្រូវទទួលពីភ្ញៀវ",refundD:"ត្រូវសងភ្ញៀវវិញ",payDone:"បានបង់គ្រប់ហើយ",showQr:"បង្ហាញ QR ABA",qrT:"ស្កេនបង់ប្រាក់តាម ABA",qrNone:"មិនទាន់មានរូប QR ទេ។ សូមបញ្ចូលរូប QR ABA នៅក្នុងផ្នែក «តម្លៃក្នុងមួយយប់» នៅលើទំព័រដើម។",qrUp:"រូប QR ABA របស់ផ្ទះសំណាក់ (សម្រាប់ឲ្យភ្ញៀវស្កេន)",qrDel:"លុបរូប QR",qrSaved:"បានរក្សាទុករូប QR",hPrepA:"បង់ជាមុន ($)",hPrepM:"វិធីបង់ជាមុន",hBalA:"បង់ពេលចេញ ($)",hBalM:"វិធីបង់ពេលចេញ",hCash:"សាច់ប្រាក់ ($)",hAba:"ABA ($)",rcvCashT:"សាច់ប្រាក់ទទួលថ្ងៃនេះ",rcvAbaT:"ABA ទទួលថ្ងៃនេះ",rcvCashA:"សាច់ប្រាក់ទទួលសរុប",rcvAbaA:"ABA ទទួលសរុប"},
 en:{codeT:"Enter access code",codeH:"This code keeps HENG HEAP data private. All staff use the same code to see the same data. Do not share it with anyone else.",codeL:"Access code (at least 8 letters a-z or numbers)",codeGo:"Enter",codeBad:"The code needs at least 8 characters (a-z or 0-9)",codeChg:"Change code",netOn:"Shared data (online)",netErr:"Cannot reach the database",netLocal:"Database not connected. Data stays on this device only.",netWait:"Connecting…",hist:"History",clearHist:"Clear all history",confirmClear:"Clear ALL history? This cannot be undone. Export to Excel first if you need a copy.",delFail:"Could not delete. Run the new SQL in heng-heap-setup.sql in Supabase.",histT:"Guest history",byDay:"By day",stays:"All stays",outNow:"Check out now",close:"Close",recorded:"Recorded",noHist:"No history yet. It appears once guests check in.",hInR:"Check-ins (rooms)",hInP:"Check-ins (people)",hInT:"Check-in times",hOutT:"Check-out times",title:"HENG HEAP Guest House",add:"Add room",export:"Export to Excel",prices:"Prices per night ($)",b2:"2 beds",b1:"1 bed",ac:"AC",fan:"Fan",all:"All",
 st_available:"Available",st_occupied:"Occupied",st_cleaning:"Needs cleaning",st_maintenance:"Maintenance",dbl:"Double rooms (2 beds)",sgl:"Single rooms (1 bed)",room:"Room",roomNo:"Room number",beds:"Beds",
 cool:"AC or fan",status:"Status",capL:"Max people",peopleL:"Guests staying",guest:"Guest name",cin:"Check in",cout:"Check out",cinNow:"Check in now",
@@ -269,7 +273,7 @@ hrMode:"Hourly rest",nightMode:"Overnight",stayType:"Stay type",hrsL:"Hours",hr:
 hrPrices:"Hourly rest price ($ per session)",hhL:"Hours per session",
 men:"Men",women:"Women",kids:"Children",guestsL:"Guests",needG:"Please choose the number of guests",gMen:"Men",gWomen:"Women",gKids:"Children",
 amtL:"Total charged ($) — empty = standard price",sumL:"Total",billStd:"Standard price",billT:"Bill and check out",billAmt:"Total charge ($)",billHint:"You can change it if the amount differs from the standard price",billOk:"Receive & check out",payOut:"Bill & check out",
-hType:"Type",hAmt:"Amount ($)",hRev:"Revenue ($)",hHours:"Hours",hCool:"AC / Fan",sToday:"Revenue today",sAll:"Total revenue",payT:"Payment",pRoom:"Room type",pNight:"Per night ($)",pHour:"Hourly rest ($ per session)",calT:"Calendar",todayB:"Today",sIn:"Check-in",sOut:"Check-out",sStay:"Staying",search:"Search room number or guest name",stayCnt:"stays",monthRev:"Revenue this month",dayEmpty:"No guests on this day.",pickDay:"Tap a day to see its guests",paidVia:"Paid via",payWhen:"When to pay",payIn:"Pay at check-in",payOutT:"Pay at check-out",payMeth:"Payment method",cash:"Cash",aba:"ABA (scan QR)",prepL:"Paid in advance ($)",prepD:"Prepaid",balD:"Balance",dueNow:"Collect from guest",refundD:"Refund to guest",payDone:"Fully paid",showQr:"Show ABA QR",qrT:"Scan to pay with ABA",qrNone:"No QR image yet. Upload your ABA QR in the \"Prices per night\" section on the main page.",qrUp:"Guest house ABA QR image (for guests to scan)",qrDel:"Remove QR",qrSaved:"QR image saved",hPrepA:"Prepaid ($)",hPrepM:"Prepaid method",hBalA:"Paid at check-out ($)",hBalM:"Check-out method",hCash:"Cash ($)",hAba:"ABA ($)",rcvCashT:"Cash received today",rcvAbaT:"ABA received today",rcvCashA:"Cash received total",rcvAbaA:"ABA received total"}};
+hType:"Type",hAmt:"Amount ($)",hRev:"Revenue ($)",hHours:"Hours",hCool:"AC / Fan",sToday:"Revenue today",sAll:"Total revenue",payT:"Payment",editStay:"Edit stay",pRoom:"Room type",pNight:"Per night ($)",pHour:"Hourly rest ($ per session)",calT:"Calendar",todayB:"Today",sIn:"Check-in",sOut:"Check-out",sStay:"Staying",search:"Search room number or guest name",stayCnt:"stays",monthRev:"Revenue this month",dayEmpty:"No guests on this day.",pickDay:"Tap a day to see its guests",paidVia:"Paid via",payWhen:"When to pay",payIn:"Pay at check-in",payOutT:"Pay at check-out",payMeth:"Payment method",cash:"Cash",aba:"ABA (scan QR)",prepL:"Paid in advance ($)",prepD:"Prepaid",balD:"Balance",dueNow:"Collect from guest",refundD:"Refund to guest",payDone:"Fully paid",showQr:"Show ABA QR",qrT:"Scan to pay with ABA",qrNone:"No QR image yet. Upload your ABA QR in the \"Prices per night\" section on the main page.",qrUp:"Guest house ABA QR image (for guests to scan)",qrDel:"Remove QR",qrSaved:"QR image saved",hPrepA:"Prepaid ($)",hPrepM:"Prepaid method",hBalA:"Paid at check-out ($)",hBalM:"Check-out method",hCash:"Cash ($)",hAba:"ABA ($)",rcvCashT:"Cash received today",rcvAbaT:"ABA received today",rcvCashA:"Cash received total",rcvAbaA:"ABA received total"}};
 const WD={km:["ថ្ងៃអាទិត្យ","ថ្ងៃច័ន្ទ","ថ្ងៃអង្គារ","ថ្ងៃពុធ","ថ្ងៃព្រហស្បតិ៍","ថ្ងៃសុក្រ","ថ្ងៃសៅរ៍"],en:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]};
 const MO={km:["មករា","កុម្ភៈ","មីនា","មេសា","ឧសភា","មិថុនា","កក្កដា","សីហា","កញ្ញា","តុលា","វិច្ឆិកា","ធ្នូ"],en:["January","February","March","April","May","June","July","August","September","October","November","December"]};
 const ST={available:"var(--free)",occupied:"var(--busy)",cleaning:"var(--clean)",maintenance:"var(--fix)"};
@@ -369,7 +373,7 @@ function tile(r){
   ${hr?`<span class="tag">⏱ ${t("hrMode")} · ${r.hrs||hh()} ${t("hr")}</span>${end?`<div class="cd" data-end="${end}"></div><span class="type">${t("untilT")} ${hm(new Date(end))}</span>`:""}`:""}
   <span class="type">${t("cin")}: ${r.ci?fmt(r.ci)+" "+(r.cit||""):"—"}${!hr&&r.co?` · ${t("cout")}: ${fmt(r.co)} ${r.cot||""}`:""}${!hr&&r.ci?` · ${nightsB(r)} ${t("night")}`:""}</span>
   <span class="amt">${t("sumL")}: ${money(total(r))}</span>`:""}
-  <div class="tools">${btn}<button class="btn ghost sm" data-a="view" data-id="${r.id}">${t("view")}</button><button class="btn ghost sm" data-a="edit" data-id="${r.id}">${t("edit")}</button></div></div>`;
+  <div class="tools">${btn}<button class="btn ghost sm" data-a="view" data-id="${r.id}">${t("view")}</button><button class="btn ghost sm" data-a="edit" data-id="${r.id}">${t("edit")}</button>${occ?`<button class="btn ghost sm" data-a="estay" data-id="${r.id}">${t("editStay")}</button>`:""}</div></div>`;
 }
 const sumAmt=a=>a.reduce((x,s)=>x+(+s.amount||0),0);
 function revHtml(full){const S=stays(),td=ymd(new Date()),R=rcv(S,td),A=rcv(S);return `<div><b>${money(sumAmt(S.filter(s=>s.ci==td)))}</b><span>${t("sToday")}</span></div><div><b>${money(sumAmt(S))}</b><span>${t("sAll")}</span></div><div><b>${money(R.cash)}</b><span>${t("rcvCashT")}</span></div><div><b>${money(R.aba)}</b><span>${t("rcvAbaT")}</span></div>`+(full?`<div><b>${money(A.cash)}</b><span>${t("rcvCashA")}</span></div><div><b>${money(A.aba)}</b><span>${t("rcvAbaA")}</span></div>`:"")}
@@ -401,10 +405,10 @@ function applyLang(){
 }
 $("lang").onclick=()=>{lang=lang=="km"?"en":"km";try{localStorage.setItem(LKEY,lang)}catch(e){}applyLang()};
 
-let dEnd=null,prevMode="night",ppAuto=true;
+let dEnd=null,prevMode="night",ppAuto=true,dMode="room";
 const fillCnt=(id,v)=>{const mx=Math.max(4,+v||0);$(id).innerHTML=Array.from({length:mx+1},(_,i)=>`<option value="${i}">${i}</option>`).join("");$(id).value=+v||0};
-function openDlg(id,inNow,mode){
-  editing=id;const now=new Date();dEnd=null;
+function openDlg(id,inNow,mode,dm){
+  dm=dm||(inNow?"stay":"room");dMode=dm;editing=id;const now=new Date();dEnd=null;
   const r={...(rooms.find(x=>x.id==id)||{n:"",beds:1,cap:2,cool:"fan",status:"available",guest:"",people:0,ci:"",cit:"",co:"",cot:"",notes:""})};
   r.mode=r.mode||"night";r.hrs=r.hrs||hh();r.pt=r.pt||"out";r.pm=r.pm||"cash";ppAuto=!(+r.paid>0);r.paid=+r.paid>0?r.paid:"";
   if(!(+r.m||+r.w||+r.c)&&+r.people>0)r.m=+r.people;
@@ -416,7 +420,11 @@ function openDlg(id,inNow,mode){
   [["n","n"],["b","beds"],["cp","cap"],["c","cool"],["s","status"],["g","guest"],["ci","ci"],["cit","cit"],["co","co"],["cot","cot"],["no","notes"],["md","mode"],["hrs","hrs"],["am","amt"],["pt","pt"],["pm","pm"],["pp","paid"]].forEach(([i,k])=>$(i).value=r[k]??"");
   fillCnt("m",r.m);fillCnt("w",r.w);fillCnt("k",r.c);
   $("hrsW").style.display=r.mode=="hour"?"":"none";prevMode=r.mode;
-  const sr=rooms.find(x=>x.id==id);$("outNow").style.display=sr&&sr.status=="occupied"?"":"none";$("delRm").style.display=sr?"":"none";est();tick();$("dlg").showModal();
+  const sr=rooms.find(x=>x.id==id);$("outNow").style.display=sr&&sr.status=="occupied"?"":"none";$("delRm").style.display=sr&&dm=="room"?"":"none";
+  const rm=dm=="room",occR=!!sr&&sr.status=="occupied";
+  $("gRoom").style.display=rm?"":"none";$("gStay").style.display=rm?"none":"";$("mdW").style.display=rm?"none":"";$("stW").style.display=rm&&occR?"none":"";
+  [...$("s").options].forEach(o=>{o.disabled=rm&&o.value=="occupied"&&!occR});
+  est();tick();$("dlg").showModal();
 }
 const cur=()=>({beds:+$("b").value,cool:$("c").value,ci:$("ci").value,co:$("co").value,mode:$("md").value,hrs:+$("hrs").value||hh(),amt:$("am").value,status:"occupied"});
 const gt=()=>(+$("m").value||0)+(+$("w").value||0)+(+$("k").value||0);
@@ -428,7 +436,10 @@ function est(){
   payUi(f);chk();
 }
 function payUi(f){const pin=$("pt").value=="in";$("pmW").style.display=$("ppW").style.display=pin?"":"none";$("qrRow").style.display=pin&&$("pm").value=="aba"?"":"none";if(pin&&ppAuto)$("pp").value=f}
-function chk(){const g=gt();$("m").setCustomValidity(g>(+$("cp").value||0)?t("over"):($("s").value=="occupied"&&!g)?t("needG"):"");$("ptot").textContent=`${t("guestsL")}: ${g} ${t("ppl")}`}
+function chk(){const g=gt();
+  if(dMode=="room"){const sr=rooms.find(x=>x.id==editing),pp=sr&&sr.status=="occupied"?(+sr.people||0):0;$("m").setCustomValidity("");$("cp").setCustomValidity(pp>(+$("cp").value||0)?t("over"):"")}
+  else{$("cp").setCustomValidity("");$("m").setCustomValidity(g>(+$("cp").value||0)?t("over"):($("s").value=="occupied"&&!g)?t("needG"):"")}
+  $("ptot").textContent=`${t("guestsL")}: ${g} ${t("ppl")}`}
 function autoEnd(){
   if($("md").value!="hour")return;const ci=$("ci").value,ct=$("cit").value;if(!ci||!ct)return;
   const e=dEnd?new Date(dEnd):new Date(new Date(ci+"T"+ct).getTime()+(+$("hrs").value||hh())*36e5);
@@ -487,7 +498,8 @@ document.querySelector("main").addEventListener("click",e=>{
   const f=e.target.closest("[data-f]");if(f){filter=f.dataset.f;render();return}
   const b=e.target.closest("[data-a]");if(!b)return;
   const r=rooms.find(x=>x.id==b.dataset.id),a=b.dataset.a;
-  if(a=="edit")openDlg(r.id);
+  if(a=="edit")openDlg(r.id,false,null,"room");
+  else if(a=="estay")openDlg(r.id,false,null,"stay");
   else if(a=="view")openView(r.id);
   else if(a=="in")openDlg(r.id,true,"night");
   else if(a=="inh")openDlg(r.id,true,"hour");
@@ -495,6 +507,12 @@ document.querySelector("main").addEventListener("click",e=>{
   else if(a=="out")openBill(r);
 });
 $("f").onsubmit=()=>{
+  if(dMode=="room"){
+    const old=rooms.find(x=>x.id==editing),d={n:$("n").value.trim(),beds:+$("b").value,cap:+$("cp").value||1,cool:$("c").value};
+    if(old){if(old.status!="occupied")d.status=$("s").value;Object.assign(old,d)}
+    else rooms.push({id:"r"+Date.now(),...d,status:$("s").value,guest:"",people:0,m:0,w:0,c:0,mode:"night",hrs:0,amt:"",endAt:null,ci:"",cit:"",co:"",cot:"",notes:"",pt:"out",pm:"",paid:0,pmOut:""});
+    rooms.sort(byNum);save();render();return;
+  }
   const hr=$("md").value=="hour";
   const d={n:$("n").value.trim(),beds:+$("b").value,cap:+$("cp").value||1,cool:$("c").value,status:$("s").value,guest:$("g").value.trim(),people:gt(),m:+$("m").value||0,w:+$("w").value||0,c:+$("k").value||0,mode:$("md").value,hrs:+$("hrs").value||hh(),amt:$("am").value===""?"":Math.max(0,+$("am").value||0),ci:$("ci").value,cit:$("cit").value,co:$("co").value,cot:$("cot").value,notes:$("no").value.trim(),pt:$("pt").value,pm:$("pm").value,paid:$("pt").value=="in"?Math.max(0,+$("pp").value||0):0};
   d.endAt=hr&&d.status=="occupied"?(dEnd||(d.co&&d.cot?new Date(d.co+"T"+d.cot).getTime():null)):null;
@@ -531,7 +549,7 @@ function openView(id){
   $("vdlg").showModal();tick();
 }
 $("vx").onclick=$("vcl").onclick=()=>$("vdlg").close();
-$("vedit").onclick=()=>{$("vdlg").close();openDlg(viewing)};
+$("vedit").onclick=()=>{$("vdlg").close();const r=rooms.find(x=>x.id==viewing);openDlg(viewing,false,null,r&&r.status=="occupied"?"stay":"room")};
 $("vbill").onclick=()=>{const r=rooms.find(x=>x.id==viewing);if(r){$("vdlg").close();openBill(r)}};
 
 // ---- time-up alert (hourly rest) ----
