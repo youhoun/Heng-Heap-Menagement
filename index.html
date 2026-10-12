@@ -89,6 +89,21 @@ input,select,textarea{display:block;width:100%;margin-top:3px;font:inherit;color
 .arow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
 dialog.alert{border:3px solid var(--fix)}
 .hint{color:var(--mute);font-size:.8rem;margin:-6px 0 10px}
+.pay{font-size:.85rem;font-weight:600;color:var(--free)}.pay.due{color:var(--clean)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px}
+.cal .wd{text-align:center;color:var(--mute);font-size:.8rem;padding:2px 0}
+.dy{min-height:60px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);padding:4px 2px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:1px;font-size:.9rem;min-width:0}
+.dy.off{opacity:.5}.dy.has{border-color:var(--accent)}
+.dy.today{box-shadow:inset 0 0 0 2px var(--clean)}
+.dy.sel{background:var(--accent);color:var(--bg);border-color:var(--accent);opacity:1}
+.dy small{font-size:.7rem;opacity:.9}
+.dy .n{background:var(--busy);color:#fff;border-radius:999px;padding:0 7px;font-size:.75rem;font-weight:600}
+.dy.sel .n{background:var(--bg);color:var(--accent)}
+.dg{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;margin-top:10px}
+.dc{border:1px solid var(--line);border-left:5px solid var(--c);border-radius:10px;padding:10px 12px;background:var(--bg);display:flex;flex-direction:column;gap:2px}
+.calnav{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px}
+.calnav .ttl{font-weight:700;font-size:1.1rem}
+@media (max-width:520px){.dy{min-height:52px;font-size:.8rem}.dy small{display:none}}
 </style>
 </head>
 <body>
@@ -121,6 +136,9 @@ dialog.alert{border:3px solid var(--fix)}
     <label><span data-i18n="b1"></span> · <span data-i18n="fan"></span><input type="number" min="0" step="0.5" data-p="h-1-fan"></label>
     <label><span data-i18n="hhL"></span><input type="number" min="0.5" step="0.5" data-p="hh"></label>
   </div>
+  <p class="sub" style="margin-top:14px" data-i18n="qrUp"></p>
+  <div class="nowrow"><input type="file" id="qrFile" accept="image/*" style="width:auto;max-width:100%"><button type="button" class="btn ghost sm" id="qrDel" data-i18n="qrDel"></button></div>
+  <img id="qrPrev" alt="ABA QR" style="max-width:160px;display:none;border-radius:8px;background:#fff">
 </details>
 <div class="filters" id="filters"></div>
 <h2 id="h2"></h2><div class="grid" id="g2"></div>
@@ -161,6 +179,12 @@ dialog.alert{border:3px solid var(--fix)}
     </div>
     <label><span data-i18n="notes"></span><textarea id="no" rows="2"></textarea></label>
     <label><span data-i18n="amtL"></span><input id="am" type="number" min="0" step="0.5" inputmode="decimal"></label>
+    <div class="row">
+      <label><span data-i18n="payWhen"></span><select id="pt"><option value="out" data-i18n="payOutT"></option><option value="in" data-i18n="payIn"></option></select></label>
+      <label id="pmW" style="display:none"><span data-i18n="payMeth"></span><select id="pm"><option value="cash" data-i18n="cash"></option><option value="aba" data-i18n="aba"></option></select></label>
+    </div>
+    <label id="ppW" style="display:none"><span data-i18n="prepL"></span><input id="pp" type="number" min="0" step="0.5" inputmode="decimal"></label>
+    <div class="nowrow" id="qrRow" style="display:none"><button type="button" class="btn ghost sm" id="qrBtn" data-i18n="showQr"></button></div>
     <div class="est" id="est"></div>
     <div class="actions">
       <button type="button" class="btn ghost" id="delRm" data-i18n="delRoom" style="margin-right:auto;color:#c0392b"></button>
@@ -188,8 +212,16 @@ dialog.alert{border:3px solid var(--fix)}
     <div id="binfo" style="margin-bottom:12px"></div>
     <label><span data-i18n="billAmt"></span><input id="bam" type="number" min="0" step="0.5" inputmode="decimal" required></label>
     <div class="hint" data-i18n="billHint"></div>
+    <div id="bdue" style="margin-bottom:10px"></div>
+    <div id="bmW"><div class="hint" data-i18n="payMeth"></div>
+      <div class="filters" id="bm"><button type="button" class="chip" data-m="cash" aria-pressed="true">💵 <span data-i18n="cash"></span></button><button type="button" class="chip" data-m="aba" aria-pressed="false">📱 <span data-i18n="aba"></span></button></div>
+      <div id="bqr" style="text-align:center;margin:10px 0"></div></div>
     <div class="actions"><button type="button" class="btn ghost" id="bc" data-i18n="cancel"></button><button type="submit" class="btn out" data-i18n="billOk"></button></div>
   </form>
+</dialog>
+<dialog id="qdlg">
+  <div class="dh"><h2 data-i18n="qrT"></h2><button type="button" class="x" id="qx">✕</button></div>
+  <div class="db" id="qbody" style="text-align:center"></div>
 </dialog>
 <dialog id="adlg" class="alert">
   <div class="dh"><h2>⏰ <span data-i18n="timeUp"></span></h2></div>
@@ -215,8 +247,8 @@ hMonth:"ខែ",hCheckins:"ចំនួនដងចូលស្នាក់",hPe
 hrMode:"សម្រាកម៉ោង",nightMode:"ស្នាក់យប់",stayType:"ប្រភេទស្នាក់",hrsL:"ចំនួនម៉ោងសម្រាក",hr:"ម៉ោង",left:"នៅសល់",timeUp:"ដល់ម៉ោងហើយ!",ok:"យល់ព្រម",untilT:"ដល់ម៉ោង",
 hrPrices:"តម្លៃសម្រាកម៉ោង ($ ក្នុងមួយលើក)",hhL:"ចំនួនម៉ោងក្នុងមួយលើក",
 men:"ប្រុស",women:"ស្រី",kids:"កូនក្មេង",guestsL:"ចំនួនភ្ញៀវ",needG:"សូមជ្រើសរើសចំនួនភ្ញៀវ",gMen:"ប្រុស (នាក់)",gWomen:"ស្រី (នាក់)",gKids:"កូនក្មេង (នាក់)",
-amtL:"តម្លៃសរុបដែលយក ($) — ទុកទទេ = តម្លៃដើម",sumL:"សរុប",billStd:"តម្លៃដើម",billT:"គិតលុយ និងចាកចេញ",billAmt:"តម្លៃសរុបដែលទទួលបាន ($)",billHint:"អាចប្តូរបាន ប្រសិនបើយកខុសពីតម្លៃដើម",billOk:"ទទួលលុយ & ចាកចេញ",payOut:"គិតលុយ & ចាកចេញ",
-hType:"ប្រភេទ",hAmt:"ទឹកប្រាក់ ($)",hRev:"ចំណូល ($)",hHours:"ចំនួនម៉ោង",hCool:"ម៉ាស៊ីន/កង្ហារ",sToday:"ចំណូលថ្ងៃនេះ",sAll:"ចំណូលសរុប"},
+amtL:"តម្លៃសរុបដែលយក ($) — ទុកទទេ = តម្លៃដើម",sumL:"សរុប",billStd:"តម្លៃដើម",billT:"គិតលុយ និងចាកចេញ",billAmt:"តម្លៃសរុបនៃការស្នាក់ ($)",billHint:"អាចប្តូរបាន ប្រសិនបើយកខុសពីតម្លៃដើម",billOk:"ទទួលលុយ & ចាកចេញ",payOut:"គិតលុយ & ចាកចេញ",
+hType:"ប្រភេទ",hAmt:"ទឹកប្រាក់ ($)",hRev:"ចំណូល ($)",hHours:"ចំនួនម៉ោង",hCool:"ម៉ាស៊ីន/កង្ហារ",sToday:"ចំណូលថ្ងៃនេះ",sAll:"ចំណូលសរុប",payT:"ការបង់ប្រាក់",calT:"ប្រតិទិន",todayB:"ថ្ងៃនេះ",sIn:"ចូលស្នាក់",sOut:"ចាកចេញ",sStay:"កំពុងស្នាក់",search:"ស្វែងរកលេខបន្ទប់ ឬឈ្មោះភ្ញៀវ",stayCnt:"ការស្នាក់",monthRev:"ចំណូលខែនេះ",dayEmpty:"ថ្ងៃនេះមិនមានភ្ញៀវទេ។",pickDay:"ចុចលើថ្ងៃណាមួយ ដើម្បីមើលភ្ញៀវ",paidVia:"បង់ប្រាក់រួចតាម",payWhen:"ពេលបង់ប្រាក់",payIn:"បង់ពេលចូលស្នាក់",payOutT:"បង់ពេលចាកចេញ",payMeth:"វិធីបង់ប្រាក់",cash:"សាច់ប្រាក់",aba:"ABA (ស្កេន QR)",prepL:"ទឹកប្រាក់បានបង់ជាមុន ($)",prepD:"បានបង់ជាមុន",balD:"នៅសល់",dueNow:"ត្រូវទទួលពីភ្ញៀវ",refundD:"ត្រូវសងភ្ញៀវវិញ",payDone:"បានបង់គ្រប់ហើយ",showQr:"បង្ហាញ QR ABA",qrT:"ស្កេនបង់ប្រាក់តាម ABA",qrNone:"មិនទាន់មានរូប QR ទេ។ សូមបញ្ចូលរូប QR ABA នៅក្នុងផ្នែក «តម្លៃក្នុងមួយយប់» នៅលើទំព័រដើម។",qrUp:"រូប QR ABA របស់ផ្ទះសំណាក់ (សម្រាប់ឲ្យភ្ញៀវស្កេន)",qrDel:"លុបរូប QR",qrSaved:"បានរក្សាទុករូប QR",hPrepA:"បង់ជាមុន ($)",hPrepM:"វិធីបង់ជាមុន",hBalA:"បង់ពេលចេញ ($)",hBalM:"វិធីបង់ពេលចេញ",hCash:"សាច់ប្រាក់ ($)",hAba:"ABA ($)",rcvCashT:"សាច់ប្រាក់ទទួលថ្ងៃនេះ",rcvAbaT:"ABA ទទួលថ្ងៃនេះ",rcvCashA:"សាច់ប្រាក់ទទួលសរុប",rcvAbaA:"ABA ទទួលសរុប"},
 en:{codeT:"Enter access code",codeH:"This code keeps HENG HEAP data private. All staff use the same code to see the same data. Do not share it with anyone else.",codeL:"Access code (at least 8 letters a-z or numbers)",codeGo:"Enter",codeBad:"The code needs at least 8 characters (a-z or 0-9)",codeChg:"Change code",netOn:"Shared data (online)",netErr:"Cannot reach the database",netLocal:"Database not connected. Data stays on this device only.",netWait:"Connecting…",hist:"History",clearHist:"Clear all history",confirmClear:"Clear ALL history? This cannot be undone. Export to Excel first if you need a copy.",delFail:"Could not delete. Run the new SQL in heng-heap-setup.sql in Supabase.",histT:"Guest history",byDay:"By day",stays:"All stays",outNow:"Check out now",close:"Close",recorded:"Recorded",noHist:"No history yet. It appears once guests check in.",hInR:"Check-ins (rooms)",hInP:"Check-ins (people)",hInT:"Check-in times",hOutT:"Check-out times",title:"HENG HEAP Guest House",add:"Add room",export:"Export to Excel",prices:"Prices per night ($)",b2:"2 beds",b1:"1 bed",ac:"AC",fan:"Fan",all:"All",
 st_available:"Available",st_occupied:"Occupied",st_cleaning:"Needs cleaning",st_maintenance:"Maintenance",dbl:"Double rooms (2 beds)",sgl:"Single rooms (1 bed)",room:"Room",roomNo:"Room number",beds:"Beds",
 cool:"AC or fan",status:"Status",capL:"Max people",peopleL:"Guests staying",guest:"Guest name",cin:"Check in",cout:"Check out",cinNow:"Check in now",
@@ -229,8 +261,8 @@ hMonth:"Month",hCheckins:"Check-ins",hPeopleCI:"People checked in",hRoomNights:"
 hrMode:"Hourly rest",nightMode:"Overnight",stayType:"Stay type",hrsL:"Hours",hr:"hr",left:"Left",timeUp:"Time is up!",ok:"OK",untilT:"Until",
 hrPrices:"Hourly rest price ($ per session)",hhL:"Hours per session",
 men:"Men",women:"Women",kids:"Children",guestsL:"Guests",needG:"Please choose the number of guests",gMen:"Men",gWomen:"Women",gKids:"Children",
-amtL:"Total charged ($) — empty = standard price",sumL:"Total",billStd:"Standard price",billT:"Bill and check out",billAmt:"Amount received ($)",billHint:"You can change it if the amount differs from the standard price",billOk:"Receive & check out",payOut:"Bill & check out",
-hType:"Type",hAmt:"Amount ($)",hRev:"Revenue ($)",hHours:"Hours",hCool:"AC / Fan",sToday:"Revenue today",sAll:"Total revenue"}};
+amtL:"Total charged ($) — empty = standard price",sumL:"Total",billStd:"Standard price",billT:"Bill and check out",billAmt:"Total charge ($)",billHint:"You can change it if the amount differs from the standard price",billOk:"Receive & check out",payOut:"Bill & check out",
+hType:"Type",hAmt:"Amount ($)",hRev:"Revenue ($)",hHours:"Hours",hCool:"AC / Fan",sToday:"Revenue today",sAll:"Total revenue",payT:"Payment",calT:"Calendar",todayB:"Today",sIn:"Check-in",sOut:"Check-out",sStay:"Staying",search:"Search room number or guest name",stayCnt:"stays",monthRev:"Revenue this month",dayEmpty:"No guests on this day.",pickDay:"Tap a day to see its guests",paidVia:"Paid via",payWhen:"When to pay",payIn:"Pay at check-in",payOutT:"Pay at check-out",payMeth:"Payment method",cash:"Cash",aba:"ABA (scan QR)",prepL:"Paid in advance ($)",prepD:"Prepaid",balD:"Balance",dueNow:"Collect from guest",refundD:"Refund to guest",payDone:"Fully paid",showQr:"Show ABA QR",qrT:"Scan to pay with ABA",qrNone:"No QR image yet. Upload your ABA QR in the \"Prices per night\" section on the main page.",qrUp:"Guest house ABA QR image (for guests to scan)",qrDel:"Remove QR",qrSaved:"QR image saved",hPrepA:"Prepaid ($)",hPrepM:"Prepaid method",hBalA:"Paid at check-out ($)",hBalM:"Check-out method",hCash:"Cash ($)",hAba:"ABA ($)",rcvCashT:"Cash received today",rcvAbaT:"ABA received today",rcvCashA:"Cash received total",rcvAbaA:"ABA received total"}};
 const WD={km:["ថ្ងៃអាទិត្យ","ថ្ងៃច័ន្ទ","ថ្ងៃអង្គារ","ថ្ងៃពុធ","ថ្ងៃព្រហស្បតិ៍","ថ្ងៃសុក្រ","ថ្ងៃសៅរ៍"],en:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]};
 const MO={km:["មករា","កុម្ភៈ","មីនា","មេសា","ឧសភា","មិថុនា","កក្កដា","សីហា","កញ្ញា","តុលា","វិច្ឆិកា","ធ្នូ"],en:["January","February","March","April","May","June","July","August","September","October","November","December"]};
 const ST={available:"var(--free)",occupied:"var(--busy)",cleaning:"var(--clean)",maintenance:"var(--fix)"};
@@ -284,6 +316,17 @@ const endMs=r=>+r.endAt||(r.co&&r.cot?new Date(r.co+"T"+r.cot).getTime():0);
 const fmtCd=ms=>{const a=Math.floor(Math.abs(ms)/1000),h=Math.floor(a/3600);return h+":"+p2(Math.floor(a%3600/60))+":"+p2(a%60)};
 const fmt=d=>{if(!d)return"";const x=pd(d);return x.getDate()+" "+MO[lang][x.getMonth()]};
 const byNum=(a,b)=>a.n.localeCompare(b.n,undefined,{numeric:true});
+const mName=m=>m=="aba"?"ABA":m=="cash"?t("cash"):"";
+const qrOk=()=>typeof prices.qr=="string"&&prices.qr.startsWith("data:image/");
+const qrHtml=a=>qrOk()?`<img src="${esc(prices.qr)}" alt="ABA QR" style="max-width:100%;width:300px;border-radius:8px;background:#fff"><div class="tot" style="margin-top:8px">${money(a)}</div>`:`<p class="sub">${t("qrNone")}</p>`;
+const payTxt=(s,a)=>{const p=+s.paid||0,b=Math.round((a-p)*100)/100,o=[];
+  if(p>0)o.push(`${t("prepD")} ${money(p)} (${mName(s.pm)})`);
+  if(s.pmOut&&!s.live)o.push(`${t("payOutT")} ${money(b)} (${mName(s.pmOut)})`);
+  else if(b>0&&(s.live||s.status=="occupied"))o.push(`${t("balD")} ${money(b)}`);
+  return o.join(" + ")||"—"};
+const payLine=r=>{const p=+r.paid||0,b=Math.round((total(r)-p)*100)/100;return p>0?`<span class="pay">✓ ${t("paidVia")} ${mName(r.pm)}${b>0?` ${money(p)} · <span style="color:var(--clean)">${t("balD")} ${money(b)}</span>`:""}</span>`:`<span class="pay due">${t("payOutT")}</span>`};
+const rcv=(S,td)=>S.reduce((o,x)=>{const a=+x.amount||0,p=+x.paid||0;if(p>0&&x.pm&&(!td||x.ci==td))o[x.pm]+=p;if(!x.live&&x.pmOut&&(!td||x.co==td))o[x.pmOut]+=a-p;return o},{cash:0,aba:0});
+const bal=x=>(!x.live&&x.pmOut)?(+x.amount||0)-(+x.paid||0):0;
 
 function tick(){
   const d=new Date(),s=hm(d)+":"+p2(d.getSeconds());
@@ -298,6 +341,11 @@ setInterval(tick,1000);
 
 $("s").innerHTML=Object.keys(ST).map(k=>`<option value="${k}" data-i18n="st_${k}"></option>`).join("");
 document.querySelectorAll("[data-p]").forEach(i=>{i.value=prices[i.dataset.p];i.oninput=()=>{prices[i.dataset.p]=+i.value||0;save();render()}});
+function qrPrev(){const p=$("qrPrev");if(qrOk()){p.src=prices.qr;p.style.display=""}else{p.removeAttribute("src");p.style.display="none"}}
+$("qrFile").onchange=e=>{const f=e.target.files[0];if(!f)return;const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const m=480,k=Math.min(1,m/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);prices.qr=c.toDataURL("image/jpeg",.9);qrPrev();save();toast(t("qrSaved"))};im.onerror=()=>alert(t("saveFail"));im.src=fr.result};fr.readAsDataURL(f);e.target.value=""};
+$("qrDel").onclick=()=>{delete prices.qr;qrPrev();save()};
+$("qrBtn").onclick=()=>{$("qbody").innerHTML=qrHtml(+$("pp").value||0);$("qdlg").showModal()};
+$("qx").onclick=()=>$("qdlg").close();
 
 const gdesc=s=>[[s.m,"men"],[s.w,"women"],[s.c,"kids"]].filter(([n])=>+n>0).map(([n,k])=>`${t(k)} ${n}`).join(" · ");
 function tile(r){
@@ -309,6 +357,7 @@ function tile(r){
   return `<div class="room" style="--c:${ST[r.status]}"><div class="top"><span class="num">${t("room")} ${esc(r.n)}</span><span class="st">${t("st_"+r.status)}</span></div>
   <span class="type">${t("cap")} ${r.cap} ${t("ppl")} · ${r.cool=="ac"?t("ac"):t("fan")}</span>
   <span class="price">${money(rate(r))} / ${t("night")} · ${money(hrate(r))} / ${hh()} ${t("hr")}</span>
+  ${occ?payLine(r):""}
   ${occ?`<span class="guest">${esc(r.guest)||"—"} · ${r.people||0} ${t("ppl")}${gd?` (${esc(gd)})`:""}</span>
   ${hr?`<span class="tag">⏱ ${t("hrMode")} · ${r.hrs||hh()} ${t("hr")}</span>${end?`<div class="cd" data-end="${end}"></div><span class="type">${t("untilT")} ${hm(new Date(end))}</span>`:""}`:""}
   <span class="type">${t("cin")}: ${r.ci?fmt(r.ci)+" "+(r.cit||""):"—"}${!hr&&r.co?` · ${t("cout")}: ${fmt(r.co)} ${r.cot||""}`:""}${!hr&&r.ci?` · ${nightsB(r)} ${t("night")}`:""}</span>
@@ -316,9 +365,9 @@ function tile(r){
   <div class="tools">${btn}<button class="btn ghost sm" data-a="view" data-id="${r.id}">${t("view")}</button><button class="btn ghost sm" data-a="edit" data-id="${r.id}">${t("edit")}</button></div></div>`;
 }
 const sumAmt=a=>a.reduce((x,s)=>x+(+s.amount||0),0);
-function revHtml(){const S=stays(),td=ymd(new Date());return `<div><b>${money(sumAmt(S.filter(s=>s.ci==td)))}</b><span>${t("sToday")}</span></div><div><b>${money(sumAmt(S))}</b><span>${t("sAll")}</span></div>`}
+function revHtml(full){const S=stays(),td=ymd(new Date()),R=rcv(S,td),A=rcv(S);return `<div><b>${money(sumAmt(S.filter(s=>s.ci==td)))}</b><span>${t("sToday")}</span></div><div><b>${money(sumAmt(S))}</b><span>${t("sAll")}</span></div><div><b>${money(R.cash)}</b><span>${t("rcvCashT")}</span></div><div><b>${money(R.aba)}</b><span>${t("rcvAbaT")}</span></div>`+(full?`<div><b>${money(A.cash)}</b><span>${t("rcvCashA")}</span></div><div><b>${money(A.aba)}</b><span>${t("rcvAbaA")}</span></div>`:"")}
 function stays(){
-  return [...hist.map(h=>({...h,live:0})),...rooms.filter(r=>r.status=="occupied").map(r=>({n:r.n,beds:r.beds,cool:r.cool,mode:r.mode,hrs:r.hrs,guest:r.guest,people:r.people,m:r.m,w:r.w,c:r.c,notes:r.notes,ci:r.ci,cit:r.cit,co:r.co,cot:r.cot,amount:amtOf(r),live:1}))]
+  return [...hist.map(h=>({...h,live:0})),...rooms.filter(r=>r.status=="occupied").map(r=>({n:r.n,beds:r.beds,cool:r.cool,mode:r.mode,hrs:r.hrs,guest:r.guest,people:r.people,m:r.m,w:r.w,c:r.c,notes:r.notes,ci:r.ci,cit:r.cit,co:r.co,cot:r.cot,amount:amtOf(r),paid:r.paid,pt:r.pt,pm:r.pm,pmOut:r.pmOut,live:1}))]
     .sort((a,b)=>((a.ci||"")+(a.cit||"")).localeCompare((b.ci||"")+(b.cit||"")));
 }
 const inMs=r=>r.ci?new Date(r.ci+"T"+(r.cit||"00:00")).getTime():Infinity;
@@ -345,19 +394,19 @@ function applyLang(){
 }
 $("lang").onclick=()=>{lang=lang=="km"?"en":"km";try{localStorage.setItem(LKEY,lang)}catch(e){}applyLang()};
 
-let dEnd=null,prevMode="night";
+let dEnd=null,prevMode="night",ppAuto=true;
 const fillCnt=(id,v)=>{const mx=Math.max(4,+v||0);$(id).innerHTML=Array.from({length:mx+1},(_,i)=>`<option value="${i}">${i}</option>`).join("");$(id).value=+v||0};
 function openDlg(id,inNow,mode){
   editing=id;const now=new Date();dEnd=null;
   const r={...(rooms.find(x=>x.id==id)||{n:"",beds:1,cap:2,cool:"fan",status:"available",guest:"",people:0,ci:"",cit:"",co:"",cot:"",notes:""})};
-  r.mode=r.mode||"night";r.hrs=r.hrs||hh();
+  r.mode=r.mode||"night";r.hrs=r.hrs||hh();r.pt=r.pt||"out";r.pm=r.pm||"cash";ppAuto=!(+r.paid>0);r.paid=+r.paid>0?r.paid:"";
   if(!(+r.m||+r.w||+r.c)&&+r.people>0)r.m=+r.people;
   if(inNow){
-    Object.assign(r,{status:"occupied",ci:ymd(now),cit:hm(now),mode:mode||"night",hrs:hh(),amt:"",co:"",cot:""});
+    Object.assign(r,{status:"occupied",ci:ymd(now),cit:hm(now),mode:mode||"night",hrs:hh(),amt:"",co:"",cot:"",pt:"out",pm:"cash",paid:"",notes:""});
     if(r.mode=="hour"){const e=new Date(now.getTime()+r.hrs*36e5);r.co=ymd(e);r.cot=hm(e);dEnd=e.getTime()}
   }else if(r.mode=="hour")dEnd=+r.endAt||null;
   $("dt").textContent=id?`${t("room")} ${r.n}`:t("newRoom");
-  [["n","n"],["b","beds"],["cp","cap"],["c","cool"],["s","status"],["g","guest"],["ci","ci"],["cit","cit"],["co","co"],["cot","cot"],["no","notes"],["md","mode"],["hrs","hrs"],["am","amt"]].forEach(([i,k])=>$(i).value=r[k]??"");
+  [["n","n"],["b","beds"],["cp","cap"],["c","cool"],["s","status"],["g","guest"],["ci","ci"],["cit","cit"],["co","co"],["cot","cot"],["no","notes"],["md","mode"],["hrs","hrs"],["am","amt"],["pt","pt"],["pm","pm"],["pp","paid"]].forEach(([i,k])=>$(i).value=r[k]??"");
   fillCnt("m",r.m);fillCnt("w",r.w);fillCnt("k",r.c);
   $("hrsW").style.display=r.mode=="hour"?"":"none";prevMode=r.mode;
   const sr=rooms.find(x=>x.id==id);$("outNow").style.display=sr&&sr.status=="occupied"?"":"none";$("delRm").style.display=sr?"":"none";est();tick();$("dlg").showModal();
@@ -369,8 +418,9 @@ function est(){
   const d=hr?`${money(hrate(r))} / ${hh()} ${t("hr")} · ${r.hrs} ${t("hr")}`:`${money(rate(r))} / ${t("night")} · ${nightsB(rr)} ${t("night")}`;
   $("am").placeholder=money(a);
   $("est").innerHTML=`<div class="type">${esc(d)}</div><div class="tot">${t("sumL")}: ${money(f)}${ov&&f!==a?` <small class="type">(${t("billStd")} ${money(a)})</small>`:""}</div>`;
-  chk();
+  payUi(f);chk();
 }
+function payUi(f){const pin=$("pt").value=="in";$("pmW").style.display=$("ppW").style.display=pin?"":"none";$("qrRow").style.display=pin&&$("pm").value=="aba"?"":"none";if(pin&&ppAuto)$("pp").value=f}
 function chk(){const g=gt();$("m").setCustomValidity(g>(+$("cp").value||0)?t("over"):($("s").value=="occupied"&&!g)?t("needG"):"");$("ptot").textContent=`${t("guestsL")}: ${g} ${t("ppl")}`}
 function autoEnd(){
   if($("md").value!="hour")return;const ci=$("ci").value,ct=$("cit").value;if(!ci||!ct)return;
@@ -380,7 +430,9 @@ function autoEnd(){
 $("md").addEventListener("input",()=>{const h=$("md").value=="hour";$("hrsW").style.display=h?"":"none";if(!h&&prevMode=="hour"){$("co").value="";$("cot").value=""}prevMode=$("md").value});
 ["md","hrs","ci","cit"].forEach(i=>$(i).addEventListener("input",()=>{dEnd=null;autoEnd()}));
 ["co","cot"].forEach(i=>$(i).addEventListener("input",()=>{dEnd=null}));
-["b","c","ci","cit","co","cot","m","w","k","cp","s","md","hrs","am"].forEach(i=>$(i).addEventListener("input",est));
+$("pp").addEventListener("input",()=>{ppAuto=false});
+$("pt").addEventListener("input",()=>{if($("pt").value=="in"&&!$("pp").value)ppAuto=true});
+["b","c","ci","cit","co","cot","m","w","k","cp","s","md","hrs","am","pt","pm","pp"].forEach(i=>$(i).addEventListener("input",est));
 $("cinNow").onclick=()=>{
   const d=new Date();$("s").value="occupied";$("ci").value=ymd(d);$("cit").value=hm(d);dEnd=null;
   if($("md").value=="hour"){const e=new Date(d.getTime()+(+$("hrs").value||hh())*36e5);$("co").value=ymd(e);$("cot").value=hm(e);dEnd=e.getTime()}
@@ -400,19 +452,29 @@ $("clrH").onclick=()=>{
   hist=[];synced.hist={};save();remote("gh_clear_hist",{});renderHist();
 };
 
-function logStay(s){const ci=s.ci||s.co;if(!ci)return;hist.push({id:"h"+Date.now()+Math.random().toString(36).slice(2,6),n:s.n,beds:s.beds,cool:s.cool,mode:s.mode||"night",hrs:s.mode=="hour"?(s.hrs||hh()):0,guest:s.guest,people:s.people,m:+s.m||0,w:+s.w||0,c:+s.c||0,amount:amtOf({...s,ci}),notes:s.notes||"",ci,cit:s.ci?s.cit:s.cot,co:s.co,cot:s.cot})}
-const clear={guest:"",people:0,m:0,w:0,c:0,mode:"night",hrs:0,amt:"",endAt:null,ci:"",cit:"",co:"",cot:""};
+function logStay(s){const ci=s.ci||s.co;if(!ci)return;hist.push({id:"h"+Date.now()+Math.random().toString(36).slice(2,6),n:s.n,beds:s.beds,cool:s.cool,mode:s.mode||"night",hrs:s.mode=="hour"?(s.hrs||hh()):0,guest:s.guest,people:s.people,m:+s.m||0,w:+s.w||0,c:+s.c||0,amount:amtOf({...s,ci}),notes:s.notes||"",ci,cit:s.ci?s.cit:s.cot,co:s.co,cot:s.cot,pt:s.pt||"out",paid:+s.paid||0,pm:s.pm||"",pmOut:s.pmOut||""})}
+const clear={pt:"out",pm:"",paid:0,pmOut:"",guest:"",people:0,m:0,w:0,c:0,mode:"night",hrs:0,amt:"",endAt:null,ci:"",cit:"",co:"",cot:""};
 let tt;function toast(m){const e=$("toast");e.textContent=m;e.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>e.classList.remove("show"),4500)}
-function checkout(r){const d=new Date();r.co=ymd(d);r.cot=hm(d);const a=amtOf(r),n=r.n;logStay({...r});Object.assign(r,clear,{status:"cleaning"});save();render();toast(`✓ ${t("recorded")}: ${t("room")} ${n} · ${t("cout")} ${fmt(ymd(d))} ${hm(d)} · ${money(a)}`)}
-let billing=null;
+function checkout(r){const d=new Date();r.co=ymd(d);r.cot=hm(d);const a=amtOf(r),n=r.n,pmo=r.pmOut;logStay({...r});Object.assign(r,clear,{status:"cleaning",notes:""});save();render();toast(`✓ ${t("recorded")}: ${t("room")} ${n} · ${t("cout")} ${fmt(ymd(d))} ${hm(d)} · ${money(a)}${pmo?" · "+mName(pmo):""}`)}
+let billing=null,billM="cash",billPaid=0,billPM="";
 const stayDesc=s=>s.mode=="hour"?`⏱ ${t("hrMode")} · ${s.hrs||hh()} ${t("hr")} · ${fmt(s.ci)} ${s.cit||""}`:`${fmt(s.ci)} ${s.cit||""} → ${fmt(s.co)} ${s.cot||""} · ${nightsB(s)} ${t("night")} × ${money(rate(s))}`;
 function openBill(r){
   const d=new Date(),tmp={...r,co:ymd(d),cot:hm(d)},a=autoAmt(tmp);billing=r.id;
   $("binfo").innerHTML=`<div><b>${t("room")} ${esc(r.n)}</b> · ${esc(r.guest)||"—"} · ${r.people||0} ${t("ppl")}</div><div class="type">${esc(stayDesc(tmp))}</div><div class="type">${t("billStd")}: <b>${money(a)}</b></div>`;
-  $("bam").value=hasOv(r)?r.amt:a;$("bdlg").showModal();$("bam").select();
+  billPaid=+r.paid||0;billPM=r.pm;billM="cash";$("bam").value=hasOv(r)?r.amt:a;billUi();$("bdlg").showModal();$("bam").select();
 }
 $("bx").onclick=$("bc").onclick=()=>$("bdlg").close();
-$("bf").onsubmit=()=>{const r=rooms.find(x=>x.id==billing);if(!r)return;r.amt=Math.max(0,+$("bam").value||0);checkout(r)};
+$("bf").onsubmit=()=>{const r=rooms.find(x=>x.id==billing);if(!r)return;r.amt=Math.max(0,+$("bam").value||0);const due=Math.round((r.amt-(+r.paid||0))*100)/100;r.pmOut=due!==0?billM:"";checkout(r)};
+function billUi(){
+  const tt=Math.max(0,+$("bam").value||0),due=Math.round((tt-billPaid)*100)/100;let h="";
+  if(billPaid>0)h+=`<div class="type">${t("prepD")}: <b>${money(billPaid)}</b> · ${mName(billPM)}</div>`;
+  h+=due>0?`<div class="tot">${t("dueNow")}: ${money(due)}</div>`:due<0?`<div class="tot">${t("refundD")}: ${money(-due)}</div>`:`<div class="tot">${t("payDone")}</div>`;
+  $("bdue").innerHTML=h;$("bmW").style.display=due!==0?"":"none";
+  document.querySelectorAll("#bm [data-m]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.m==billM));
+  $("bqr").innerHTML=due>0&&billM=="aba"?qrHtml(due):"";
+}
+$("bm").onclick=e=>{const b=e.target.closest("[data-m]");if(b){billM=b.dataset.m;billUi()}};
+$("bam").addEventListener("input",billUi);
 $("outNow").onclick=()=>{const r=rooms.find(x=>x.id==editing);if(r&&r.status=="occupied"){$("dlg").close();openBill(r)}};
 document.querySelector("main").addEventListener("click",e=>{
   const f=e.target.closest("[data-f]");if(f){filter=f.dataset.f;render();return}
@@ -427,7 +489,7 @@ document.querySelector("main").addEventListener("click",e=>{
 });
 $("f").onsubmit=()=>{
   const hr=$("md").value=="hour";
-  const d={n:$("n").value.trim(),beds:+$("b").value,cap:+$("cp").value||1,cool:$("c").value,status:$("s").value,guest:$("g").value.trim(),people:gt(),m:+$("m").value||0,w:+$("w").value||0,c:+$("k").value||0,mode:$("md").value,hrs:+$("hrs").value||hh(),amt:$("am").value===""?"":Math.max(0,+$("am").value||0),ci:$("ci").value,cit:$("cit").value,co:$("co").value,cot:$("cot").value,notes:$("no").value.trim()};
+  const d={n:$("n").value.trim(),beds:+$("b").value,cap:+$("cp").value||1,cool:$("c").value,status:$("s").value,guest:$("g").value.trim(),people:gt(),m:+$("m").value||0,w:+$("w").value||0,c:+$("k").value||0,mode:$("md").value,hrs:+$("hrs").value||hh(),amt:$("am").value===""?"":Math.max(0,+$("am").value||0),ci:$("ci").value,cit:$("cit").value,co:$("co").value,cot:$("cot").value,notes:$("no").value.trim(),pt:$("pt").value,pm:$("pm").value,paid:$("pt").value=="in"?Math.max(0,+$("pp").value||0):0};
   d.endAt=hr&&d.status=="occupied"?(dEnd||(d.co&&d.cot?new Date(d.co+"T"+d.cot).getTime():null)):null;
   const old=rooms.find(x=>x.id==editing),now=new Date();
   if(old&&old.status=="occupied"&&d.status!="occupied")logStay({...old,notes:d.notes,amt:d.amt,co:d.co||old.co||ymd(now),cot:d.cot||old.cot||hm(now)});
@@ -453,6 +515,7 @@ function openView(id){
     h+=row(t("stayDur"),esc(hr?`${r.hrs||hh()} ${t("hr")}`:`${nightsB(r)} ${t("night")}`))
       +row(t("billStd"),money(autoAmt(r)))
       +row(t("chargedL"),`<b class="amt">${money(total(r))}</b>${hasOv(r)&&+r.amt!==autoAmt(r)?` <span class="type">(${t("adjusted")})</span>`:""}`)
+      +row(t("payT"),esc(payTxt(r,total(r))))
       +row(t("notes"),esc(r.notes)||"—");
   }
   $("vt").textContent=`${t("room")} ${r.n}`;
@@ -514,16 +577,56 @@ const dayRow=(d,j)=>[d.k,d.r,d.p,d.ins.length,tot(d.ins,s=>s.people),tot(d.ins,s
 const table=(h,rows)=>`<div class="tw"><table><thead><tr>${h.map(x=>`<th>${esc(x)}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${esc(c).replace(/\n/g,"<br>")}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
 const typeL=s=>s.mode=="hour"?t("hrMode"):t("nightMode");
 const durL=s=>s.mode=="hour"?`${s.hrs||hh()} ${t("hr")}`:`${s.ci?nightsB(s):0} ${t("night")}`;
-let ht="day";
-function renderHist(){
-  const{all,days}=calc();
-  $("hsum").innerHTML=revHtml();
-  $("htabs").innerHTML=[["day","byDay"],["stays","stays"]].map(([k,l])=>`<button class="chip" data-h="${k}" aria-pressed="${ht==k}">${t(l)}</button>`).join("");
-  $("hbody").innerHTML=!all.length?`<div class="empty" style="margin-top:12px">${t("noHist")}</div>`:ht=="day"
-    ?table([t("hDate"),t("hRoomsOcc"),t("hPeople"),t("hInR"),t("hInP"),t("hRev"),t("hInT"),t("hOutT")],days.slice().reverse().map(d=>{const r=dayRow(d,"\n");r[0]=fy(d.k);r[5]=money(r[5]);return r}))
-    :table([t("hRoom"),t("hGuest"),t("hType"),t("hPeople"),t("cin"),t("cout"),t("hNights"),t("hAmt"),t("hStatus"),t("notes")],all.slice().reverse().map(s=>[s.n,s.guest||"—",typeL(s),(+s.people||0)+(gdesc(s)?` (${gdesc(s)})`:""),s.ci?fy(s.ci)+" "+(s.cit||""):"—",s.co?fy(s.co)+" "+(s.cot||""):"—",durL(s),s.amount!=null?money(s.amount):"—",s.live?t("inHouse"):t("out"),s.notes||""]));
+let ht="cal",hY=null,hM=0,hSel="",hq="";
+const WS={km:["អា","ច","អ","ព","ព្រ","សុ","ស"],en:["Su","Mo","Tu","We","Th","Fr","Sa"]};
+const onDay=(x,D)=>{if(!x.ci)return null;const co=x.co||(x.live?ymd(new Date()):x.ci),last=co<x.ci?x.ci:co;if(D<x.ci||D>last)return null;return D==x.ci?"in":(D==co?"out":"stay")};
+function stayCard(x){
+  const s=x.s,k=x.k,hr=s.mode=="hour",c=k=="in"?"var(--free)":k=="out"?"var(--fix)":"var(--busy)",lbl=k=="in"?t("sIn"):k=="out"?t("sOut"):t("sStay"),gd=gdesc(s),a=+s.amount||0;
+  return `<div class="dc" style="--c:${c}"><div class="top"><span class="num">${t("room")} ${esc(s.n)}</span><span class="st">${lbl}${s.live?" · "+t("inHouse"):""}</span></div>
+  <span class="guest">${esc(s.guest)||"—"} · ${+s.people||0} ${t("ppl")}${gd?` (${esc(gd)})`:""}</span>
+  <span class="type">${hr?"⏱ "+t("hrMode")+" · "+(s.hrs||hh())+" "+t("hr"):t("nightMode")+" · "+durL(s)}</span>
+  <span class="type">${t("cin")}: ${s.ci?esc(fy(s.ci)+" "+(s.cit||"")):"—"}</span>
+  <span class="type">${t("cout")}: ${s.co?esc(fy(s.co)+" "+(s.cot||"")):"—"}</span>
+  <span class="amt">${money(a)}</span><span class="type">${esc(payTxt(s,a))}</span>${s.notes?`<span class="type">📝 ${esc(s.notes)}</span>`:""}</div>`;
 }
-$("hbtn").onclick=()=>{renderHist();$("hdlg").showModal()};
+function fillList(){
+  const{all}=calc(),q=hq.trim().toLowerCase();
+  const rows=all.filter(s=>!q||String(s.n).toLowerCase()==q||(s.guest||"").toLowerCase().includes(q)||(s.notes||"").toLowerCase().includes(q));
+  $("hlist").innerHTML=rows.length?table([t("hRoom"),t("hGuest"),t("hType"),t("hPeople"),t("cin"),t("cout"),t("hNights"),t("hAmt"),t("payT"),t("hStatus"),t("notes")],rows.slice().reverse().map(s=>[s.n,s.guest||"—",typeL(s),(+s.people||0)+(gdesc(s)?` (${gdesc(s)})`:""),s.ci?fy(s.ci)+" "+(s.cit||""):"—",s.co?fy(s.co)+" "+(s.cot||""):"—",durL(s),s.amount!=null?money(s.amount):"—",payTxt(s,+s.amount||0),s.live?t("inHouse"):t("out"),s.notes||""])):`<div class="empty" style="margin-top:12px">${t("noHist")}</div>`;
+}
+function renderHist(){
+  const{all}=calc();
+  if(hY==null){const n=new Date();hY=n.getFullYear();hM=n.getMonth();hSel=ymd(n)}
+  $("hsum").innerHTML=revHtml(1);$("hsum").style.display=ht=="stays"?"":"none";
+  $("htabs").innerHTML=[["cal","calT"],["stays","stays"]].map(([k,l])=>`<button class="chip" data-h="${k}" aria-pressed="${ht==k}">${t(l)}</button>`).join("");
+  if(ht=="stays"){
+    $("hbody").innerHTML=`<input id="hq" type="search" placeholder="${esc(t("search"))}" value="${esc(hq)}" style="margin-top:12px"><div id="hlist"></div>`;fillList();return;
+  }
+  const first=new Date(hY,hM,1).getDay(),dim=new Date(hY,hM+1,0).getDate(),td=ymd(new Date()),mp=hY+"-"+p2(hM+1);
+  let cells=WS[lang].map(x=>`<div class="wd">${x}</div>`).join("");
+  for(let i=0;i<first;i++)cells+="<div></div>";
+  for(let d=1;d<=dim;d++){
+    const D=mp+"-"+p2(d),on=all.filter(x=>onDay(x,D)),rev=tot(on.filter(x=>x.ci==D),x=>x.amount);
+    cells+=`<button type="button" class="dy${on.length?" has":" off"}${D==hSel?" sel":""}${D==td?" today":""}" data-d="${D}"><b>${d}</b>${on.length?`<span class="n">${on.length}</span><small>${money(rev)}</small>`:""}</button>`;
+  }
+  const mrev=tot(all.filter(x=>x.ci&&x.ci.startsWith(mp)),x=>x.amount);
+  let det=`<div class="empty" style="margin-top:14px">${t("pickDay")}</div>`;
+  if(hSel){
+    const on=all.map(x=>({s:x,k:onDay(x,hSel)})).filter(x=>x.k).sort((a,b)=>byNum(a.s,b.s)),R=rcv(all,hSel),sd=pd(hSel);
+    det=`<h2 style="margin-top:18px">${WD[lang][sd.getDay()]} · ${fy(hSel)} <small>${on.length} ${t("stayCnt")}</small></h2>
+    <div class="bar" style="margin-bottom:0"><div><b>${on.length}</b><span>${t("hRoomsOcc")}</span></div><div><b>${tot(on,x=>x.s.people)}</b><span>${t("hPeople")}</span></div><div><b>${money(tot(on.filter(x=>x.k=="in"),x=>x.s.amount))}</b><span>${t("hRev")}</span></div><div><b>${money(R.cash)}</b><span>${t("hCash")}</span></div><div><b>${money(R.aba)}</b><span>${t("hAba")}</span></div></div>
+    ${on.length?`<div class="dg">${on.map(stayCard).join("")}</div>`:`<div class="empty" style="margin-top:10px">${t("dayEmpty")}</div>`}`;
+  }
+  $("hbody").innerHTML=`<div class="calnav"><button type="button" class="btn ghost" data-hn="-1" aria-label="prev">‹</button><span class="ttl">${MO[lang][hM]} ${hY}</span><button type="button" class="btn ghost" data-hn="1" aria-label="next">›</button><button type="button" class="btn ghost sm" data-hn="0">${t("todayB")}</button><span class="type" style="margin-left:auto">${t("monthRev")}: <b>${money(mrev)}</b></span></div><div class="cal">${cells}</div>${det}`;
+}
+$("hbtn").onclick=()=>{hY=null;ht="cal";renderHist();$("hdlg").showModal()};
+$("hbody").addEventListener("click",e=>{
+  const d=e.target.closest("[data-d]");if(d){hSel=d.dataset.d;renderHist();return}
+  const n=e.target.closest("[data-hn]");if(!n)return;const v=+n.dataset.hn;
+  if(v==0){hY=null}else{hM+=v;if(hM<0){hM=11;hY--}else if(hM>11){hM=0;hY++}}
+  renderHist();
+});
+$("hbody").addEventListener("input",e=>{if(e.target.id=="hq"){hq=e.target.value;fillList()}});
 $("htabs").onclick=e=>{const b=e.target.closest("[data-h]");if(b){ht=b.dataset.h;renderHist()}};
 $("hx").onclick=()=>$("hdlg").close();
 $("hdlg").addEventListener("click",e=>{if(e.target==$("hdlg"))$("hdlg").close()});
@@ -532,17 +635,18 @@ $("xl").onclick=async()=>{
   if(!window.XLSX){alert(t("noXlsx"));return}
   let dl=null;try{dl=await claude.use("downloads")}catch(e){}
   const now=new Date(),{all,days}=calc();
-  const g=[[t("hRoom"),t("hBeds"),t("hCool"),t("hType"),t("hGuest"),t("hPeople"),t("men"),t("women"),t("kids"),t("cinD"),t("cinT"),t("coD"),t("coT"),t("hNights"),t("hHours"),t("hAmt"),t("hStatus"),t("notes")]];
-  all.forEach(s=>g.push([s.n,s.beds,s.cool?(s.cool=="ac"?t("ac"):t("fan")):"",typeL(s),s.guest,+s.people||0,+s.m||0,+s.w||0,+s.c||0,s.ci,s.cit,s.co,s.cot,s.mode=="hour"?0:(s.ci?nightsB(s):0),s.mode=="hour"?(s.hrs||hh()):0,+s.amount||0,s.live?t("inHouse"):t("out"),s.notes||""]));
-  const trow=Array(18).fill("");trow[14]=t("sumL");trow[15]=tot(all,s=>s.amount);g.push(trow);
+  const g=[[t("hRoom"),t("hBeds"),t("hCool"),t("hType"),t("hGuest"),t("hPeople"),t("men"),t("women"),t("kids"),t("cinD"),t("cinT"),t("coD"),t("coT"),t("hNights"),t("hHours"),t("hAmt"),t("hStatus"),t("notes"),t("hPrepA"),t("hPrepM"),t("hBalA"),t("hBalM")]];
+  all.forEach(s=>g.push([s.n,s.beds,s.cool?(s.cool=="ac"?t("ac"):t("fan")):"",typeL(s),s.guest,+s.people||0,+s.m||0,+s.w||0,+s.c||0,s.ci,s.cit,s.co,s.cot,s.mode=="hour"?0:(s.ci?nightsB(s):0),s.mode=="hour"?(s.hrs||hh()):0,+s.amount||0,s.live?t("inHouse"):t("out"),s.notes||"",+s.paid||0,mName(s.pm),bal(s),mName(s.pmOut)]));
+  const trow=Array(22).fill("");trow[14]=t("sumL");trow[15]=tot(all,s=>s.amount);g.push(trow);
   const dd=[[t("hDate"),t("hRoomsOcc"),t("hPeople"),t("hInR"),t("hInP"),t("hRev"),t("hInT"),t("hOutT")],...days.map(d=>dayRow(d,"; "))];
-  const mm={},mk=k=>mm[k]=mm[k]||{c:0,p:0,rn:0,rev:0};
+  const mm={},mk=k=>mm[k]=mm[k]||{c:0,p:0,rn:0,rev:0,cash:0,aba:0};
   days.forEach(d=>{mk(d.k.slice(0,7)).rn+=d.r});
   all.filter(s=>s.ci).forEach(s=>{const x=mk(s.ci.slice(0,7));x.c++;x.p+=+s.people||0;x.rev+=+s.amount||0});
-  const mo=[[t("hMonth"),t("hCheckins"),t("hPeopleCI"),t("hRoomNights"),t("hAvg"),t("hRev")]];
-  Object.keys(mm).sort().forEach(k=>{const[y,m]=k.split("-"),x=mm[k],n=new Date(+y,+m,0).getDate();mo.push([k,x.c,x.p,x.rn,Math.round(x.rn/n*10)/10,x.rev])});
+  all.forEach(s=>{const a=+s.amount||0,p=+s.paid||0;if(p>0&&s.pm&&s.ci)mk(s.ci.slice(0,7))[s.pm]+=p;if(!s.live&&s.pmOut&&s.co)mk(s.co.slice(0,7))[s.pmOut]+=a-p});
+  const mo=[[t("hMonth"),t("hCheckins"),t("hPeopleCI"),t("hRoomNights"),t("hAvg"),t("hRev"),t("hCash"),t("hAba")]];
+  Object.keys(mm).sort().forEach(k=>{const[y,m]=k.split("-"),x=mm[k],n=new Date(+y,+m,0).getDate();mo.push([k,x.c,x.p,x.rn,Math.round(x.rn/n*10)/10,x.rev,x.cash,x.aba])});
   const wb=XLSX.utils.book_new();
-  [[g,t("shG"),[8,6,14,14,20,10,8,8,8,12,10,12,10,8,8,12,14,40]],[dd,t("shD"),[14,18,14,16,16,14,60,60]],[mo,t("shM"),[10,16,18,16,22,14]]].forEach(([rows,name,w])=>{
+  [[g,t("shG"),[8,6,14,14,20,10,8,8,8,12,10,12,10,8,8,12,14,40,14,14,16,16]],[dd,t("shD"),[14,18,14,16,16,14,60,60]],[mo,t("shM"),[10,16,18,16,22,14,14,14]]].forEach(([rows,name,w])=>{
     const ws=XLSX.utils.aoa_to_sheet(rows);ws["!cols"]=w.map(x=>({wch:x}));XLSX.utils.book_append_sheet(wb,ws,name);
   });
   const buf=XLSX.write(wb,{type:"array",bookType:"xlsx"});
@@ -563,7 +667,7 @@ async function pull(){
     synced.hist={};hist.forEach(h=>synced.hist[h.id]=1);synced.prices=JSON.stringify(prices);
     loaded=true;net("on");
     if(capFix())save();
-    document.querySelectorAll("[data-p]").forEach(i=>{if(document.activeElement!==i)i.value=prices[i.dataset.p]});
+    document.querySelectorAll("[data-p]").forEach(i=>{if(document.activeElement!==i)i.value=prices[i.dataset.p]});qrPrev();
     render();if($("hdlg").open)renderHist();
   }catch(e){net("err")}
 }
@@ -577,6 +681,8 @@ $("lf").onsubmit=e=>{
 };
 $("chg").style.display=useDb?"":"none";
 $("chg").onclick=()=>{try{localStorage.removeItem(CKEY)}catch(e){}location.reload()};
-rooms.sort(byNum);applyLang();
+rooms.sort(byNum);applyLang();qrPrev();
 if(useDb){let c="";try{c=localStorage.getItem(CKEY)||""}catch(e){}c.length>=8?startDb(c):$("lock").showModal()}
 </script>
+</body>
+</html>
