@@ -373,7 +373,7 @@ function tile(r){
   ${hr?`<span class="tag">⏱ ${t("hrMode")} · ${r.hrs||hh()} ${t("hr")}</span>${end?`<div class="cd" data-end="${end}"></div><span class="type">${t("untilT")} ${hm(new Date(end))}</span>`:""}`:""}
   <span class="type">${t("cin")}: ${r.ci?fmt(r.ci)+" "+(r.cit||""):"—"}${!hr&&r.co?` · ${t("cout")}: ${fmt(r.co)} ${r.cot||""}`:""}${!hr&&r.ci?` · ${nightsB(r)} ${t("night")}`:""}</span>
   <span class="amt">${t("sumL")}: ${money(total(r))}</span>`:""}
-  <div class="tools">${btn}<button class="btn ghost sm" data-a="view" data-id="${r.id}">${t("view")}</button><button class="btn ghost sm" data-a="edit" data-id="${r.id}">${t("edit")}</button>${occ?`<button class="btn ghost sm" data-a="estay" data-id="${r.id}">${t("editStay")}</button>`:""}</div></div>`;
+  <div class="tools">${btn}<button class="btn ghost sm" data-a="view" data-id="${r.id}">${t("view")}</button>${occ?"":`<button class="btn ghost sm" data-a="edit" data-id="${r.id}">${t("edit")}</button>`}${occ?`<button class="btn ghost sm" data-a="estay" data-id="${r.id}">${t("editStay")}</button>`:""}</div></div>`;
 }
 const sumAmt=a=>a.reduce((x,s)=>x+(+s.amount||0),0);
 function revHtml(full){const S=stays(),td=ymd(new Date()),R=rcv(S,td),A=rcv(S);return `<div><b>${money(sumAmt(S.filter(s=>s.ci==td)))}</b><span>${t("sToday")}</span></div><div><b>${money(sumAmt(S))}</b><span>${t("sAll")}</span></div><div><b>${money(R.cash)}</b><span>${t("rcvCashT")}</span></div><div><b>${money(R.aba)}</b><span>${t("rcvAbaT")}</span></div>`+(full?`<div><b>${money(A.cash)}</b><span>${t("rcvCashA")}</span></div><div><b>${money(A.aba)}</b><span>${t("rcvAbaA")}</span></div>`:"")}
