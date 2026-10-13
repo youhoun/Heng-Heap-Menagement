@@ -47,6 +47,8 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .bar div{display:flex;flex-direction:column}
 .bar b{font-size:1.4rem}
 .bar span{color:var(--mute);font-size:.85rem}
+.mk{cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent}
+
 details{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 16px;margin-bottom:14px}
 summary{cursor:pointer;font-weight:600}
 .prices{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:10px}
@@ -335,6 +337,8 @@ const $=id=>document.getElementById(id);
 const t=k=>L[lang][k]??L.en[k]??k;
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const money=v=>"$"+(+v).toFixed(2).replace(/\.00$/,"");
+const moneyShown=new Set(),mask=m=>m.replace(/\d/g,"*");
+const mk=(k,v)=>{const m=money(v),on=moneyShown.has(k);return `<b class="mk${on?" on":""}" data-k="${k}" data-v="${m}" role="button" tabindex="0">${on?m:mask(m)}</b>`};
 const p2=n=>String(n).padStart(2,"0");
 const hm=d=>p2(d.getHours())+":"+p2(d.getMinutes());
 const ymd=d=>d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate());
@@ -400,7 +404,7 @@ function tile(r){
   <div class="tools">${viewOnly?"":btn}<button class="btn ghost sm" data-a="view" data-id="${r.id}">${t("view")}</button>${occ||viewOnly?"":`<button class="btn ghost sm" data-a="edit" data-id="${r.id}">${t("edit")}</button>`}${occ&&!viewOnly?`<button class="btn ghost sm" data-a="estay" data-id="${r.id}">${t("editStay")}</button>`:""}</div></div>`;
 }
 const sumAmt=a=>a.reduce((x,s)=>x+(+s.amount||0),0);
-function revHtml(full){const S=stays(),td=ymd(new Date()),R=rcv(S,td),A=rcv(S);return `<div><b>${money(sumAmt(S.filter(s=>s.ci==td)))}</b><span>${t("sToday")}</span></div><div><b>${money(sumAmt(S))}</b><span>${t("sAll")}</span></div><div><b>${money(R.cash)}</b><span>${t("rcvCashT")}</span></div><div><b>${money(R.aba)}</b><span>${t("rcvAbaT")}</span></div>`+(full?`<div><b>${money(A.cash)}</b><span>${t("rcvCashA")}</span></div><div><b>${money(A.aba)}</b><span>${t("rcvAbaA")}</span></div>`:"")}
+function revHtml(full){const S=stays(),td=ymd(new Date()),R=rcv(S,td),A=rcv(S);return `<div>${mk("sToday",sumAmt(S.filter(s=>s.ci==td)))}<span>${t("sToday")}</span></div><div>${mk("sAll",sumAmt(S))}<span>${t("sAll")}</span></div><div>${mk("rcvCashT",R.cash)}<span>${t("rcvCashT")}</span></div><div>${mk("rcvAbaT",R.aba)}<span>${t("rcvAbaT")}</span></div>`+(full?`<div>${mk("rcvCashA",A.cash)}<span>${t("rcvCashA")}</span></div><div>${mk("rcvAbaA",A.aba)}<span>${t("rcvAbaA")}</span></div>`:"")}
 function stays(){
   return [...hist.map(h=>({...h,live:0})),...rooms.filter(r=>r.status=="occupied").map(r=>({n:r.n,beds:r.beds,cool:r.cool,mode:r.mode,hrs:r.hrs,guest:r.guest,people:r.people,m:r.m,w:r.w,c:r.c,notes:r.notes,ci:r.ci,cit:r.cit,co:r.co,cot:r.cot,amount:amtOf(r),paid:r.paid,pt:r.pt,pm:r.pm,pmOut:r.pmOut,live:1}))]
     .sort((a,b)=>((a.ci||"")+(a.cit||"")).localeCompare((b.ci||"")+(b.cit||"")));
@@ -412,7 +416,7 @@ function render(){
   $("sum").textContent=`${rooms.length} ${t("rooms")} · ${occ.length} ${t("occ")} · ${cnt("available")} ${t("avail")}`;
   $("bar").innerHTML=`<div><b>${occ.length}/${rooms.length}</b><span>${t("sRooms")}</span></div>
   <div><b>${occ.reduce((a,r)=>a+(+r.people||0),0)}</b><span>${t("sGuests")}</span></div>
-  <div><b>${money(rooms.reduce((a,r)=>a+total(r),0))}</b><span>${t("sTotal")}</span></div>${revHtml()}`;
+  <div>${mk("sTotal",rooms.reduce((a,r)=>a+total(r),0))}<span>${t("sTotal")}</span></div>${revHtml()}`;
   $("filters").innerHTML=[["all",t("all"),rooms.length],...Object.keys(ST).map(k=>[k,t("st_"+k),cnt(k)])]
     .map(([k,l,c])=>`<button class="chip" data-f="${k}" aria-pressed="${filter==k}">${k!="all"?`<span class="dot" style="background:${ST[k]}"></span>`:""}${l} ${c}</button>`).join("");
   [[2,"g2","h2","dbl"],[1,"g1","h1","sgl"]].forEach(([b,g,h,key])=>{
@@ -632,6 +636,8 @@ try{acked=JSON.parse(localStorage.getItem("gh-ack")||"{}")}catch(e){}
 const ackK=r=>r.id+"|"+endMs(r);
 const expired=()=>{const n=Date.now();return rooms.filter(r=>r.status=="occupied"&&r.mode=="hour"&&endMs(r)&&endMs(r)<=n&&!acked[ackK(r)])};
 function ack(rs){rs.forEach(r=>acked[ackK(r)]=1);try{localStorage.setItem("gh-ack",JSON.stringify(acked))}catch(e){}}
+function toggleMoney(e){const el=e.target.closest&&e.target.closest(".mk");if(!el)return;if(e.type=="keydown"&&e.key!="Enter"&&e.key!=" ")return;e.preventDefault();const k=el.dataset.k,on=!moneyShown.has(k);on?moneyShown.add(k):moneyShown.delete(k);document.querySelectorAll('.mk[data-k="'+k+'"]').forEach(x=>{x.classList.toggle("on",on);x.textContent=on?x.dataset.v:mask(x.dataset.v)})}
+document.addEventListener("click",toggleMoney);document.addEventListener("keydown",toggleMoney);
 document.addEventListener("pointerdown",()=>{try{actx=actx||new(window.AudioContext||window.webkitAudioContext)();if(actx.state=="suspended")actx.resume()}catch(e){}});
 function beep(){
   try{if(actx){[0,.25,.5].forEach(d=>{const o=actx.createOscillator(),g=actx.createGain(),st=actx.currentTime+d;o.frequency.value=880;o.connect(g);g.connect(actx.destination);g.gain.setValueAtTime(.0001,st);g.gain.exponentialRampToValueAtTime(.4,st+.02);g.gain.exponentialRampToValueAtTime(.0001,st+.2);o.start(st);o.stop(st+.22)})}}catch(e){}
