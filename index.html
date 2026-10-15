@@ -160,6 +160,15 @@ dialog.alert{border:3px solid var(--fix)}
       <tr><th colspan="3" style="text-align:left" data-i18n="hhL"></th><td colspan="2"><input type="number" min="0" step="0.01" inputmode="decimal" data-p="hh"></td></tr>
     </tfoot>
   </table></div>
+  <p class="sub" style="margin-top:14px;font-weight:600" data-i18n="capT"></p>
+  <div class="tw" style="margin-top:6px"><table class="ptab">
+    <thead><tr><th data-i18n="pRoom"></th><th data-i18n="capAd"></th><th data-i18n="capKid"></th></tr></thead>
+    <tbody>
+      <tr><th data-i18n="b2"></th><td><input type="number" min="1" max="30" step="1" inputmode="numeric" data-p="cap-2"></td><td><input type="number" min="0" max="30" step="1" inputmode="numeric" data-p="kid-2"></td></tr>
+      <tr><th data-i18n="b1"></th><td><input type="number" min="1" max="30" step="1" inputmode="numeric" data-p="cap-1"></td><td><input type="number" min="0" max="30" step="1" inputmode="numeric" data-p="kid-1"></td></tr>
+    </tbody>
+  </table></div>
+  <div class="hint" style="margin:8px 0 0" data-i18n="capHintP"></div>
   <div style="border-top:1px solid var(--line);margin-top:14px"></div>
   <p class="sub" style="margin-top:12px" data-i18n="qrUp"></p>
   <div class="nowrow"><input type="file" id="qrFile" accept="image/*" style="width:auto;max-width:100%"><button type="button" class="btn ghost sm" id="qrDel" data-i18n="qrDel"></button></div>
@@ -178,15 +187,14 @@ dialog.alert{border:3px solid var(--fix)}
       <label><span data-i18n="roomNo"></span><input id="n" required></label>
       <label><span data-i18n="beds"></span><select id="b"><option value="1" data-i18n="b1"></option><option value="2" data-i18n="b2"></option></select></label>
     </div>
-    <div>
-      <label><span data-i18n="capL"></span><input id="cp" type="number" min="1" max="30" required></label>
-    </div>
+    <div style="display:none"><input id="cp" type="number" min="1" max="30"></div>
     </div>
     <div class="row">
       <label id="stW"><span data-i18n="status"></span><select id="s"></select></label>
       <label id="mdW"><span data-i18n="stayType"></span><select id="md"><option value="night" data-i18n="nightMode"></option><option value="hour" data-i18n="hrMode"></option></select></label>
     </div>
     <div id="gStay">
+    <label id="mvW" style="display:none"><span data-i18n="moveRoom"></span><select id="mv"></select></label>
     <label><span data-i18n="cool"></span><select id="c"><option value="ac" data-i18n="ac"></option><option value="fan" data-i18n="fan"></option></select></label>
     <label id="hrsW" style="display:none"><span data-i18n="hrsL"></span><input id="hrs" type="number" min="0.5" step="0.5"></label>
     <div class="row3">
@@ -300,11 +308,13 @@ hrPrices:"Hourly rest price ($ per session)",hhL:"Hours per session",
 men:"Men",women:"Women",kids:"Children",guestsL:"Guests",needG:"Please choose the number of guests",gMen:"Men",gWomen:"Women",gKids:"Children",
 amtL:"Total charged ($) — empty = standard price",sumL:"Total",billStd:"Standard price",billT:"Bill and check out",billAmt:"Total charge ($)",billHint:"You can change it if the amount differs from the standard price",billOk:"Receive & check out",payOut:"Bill & check out",
 hType:"Type",hAmt:"Amount ($)",hRev:"Revenue ($)",hHours:"Hours",hCool:"AC / Fan",sToday:"Revenue today",sAll:"Total revenue",payT:"Payment",editStay:"Edit stay",pRoom:"Room type",pNight:"Per night ($)",pHour:"Hourly rest ($ per session)",calT:"Calendar",todayB:"Today",sIn:"Check-in",sOut:"Check-out",sStay:"Staying",search:"Search room number or guest name",stayCnt:"stays",monthRev:"Revenue this month",dayEmpty:"No guests on this day.",pickDay:"Tap a day to see its guests",paidVia:"Paid via",payWhen:"When to pay",payIn:"Paid",payOutT:"Not yet paid",payMeth:"Payment method",cash:"Cash",aba:"ABA (scan QR)",prepL:"Paid in advance ($)",prepD:"Prepaid",balD:"Balance",dueNow:"Collect from guest",refundD:"Refund to guest",payDone:"Fully paid",showQr:"Show ABA QR",qrT:"Scan to pay with ABA",qrNone:"No QR image yet. Upload your ABA QR in the \"Prices per night\" section on the main page.",qrUp:"Guest house ABA QR image (for guests to scan)",qrDel:"Remove QR",qrSaved:"QR image saved",hPrepA:"Prepaid ($)",hPrepM:"Prepaid method",hBalA:"Paid at check-out ($)",hBalM:"Check-out method",hCash:"Cash ($)",hAba:"ABA ($)",rcvCashT:"Cash received today",rcvAbaT:"ABA received today",rcvCashA:"Cash received total",rcvAbaA:"ABA received total"}};
+Object.assign(L.km,{capT:"ចំណុះមនុស្ស តាមប្រភេទបន្ទប់",capAd:"មនុស្សធំអតិបរមា (នាក់)",capKid:"ក្មេងអតិបរមា (នាក់)",capHintP:"មនុស្សធំ = ប្រុស + ស្រី (មិនអាចលើសចំនួននេះទេ)។ ក្មេងគិតដោយឡែក ហើយកំណត់ចំនួនបានតាមប្រភេទបន្ទប់។",capMax:"អតិបរមា",overKids:"ចំនួនក្មេងលើសកំណត់របស់បន្ទប់",moveRoom:"ប្តូរទៅបន្ទប់ផ្សេង (បន្ទប់ទំនេរ)",moveNone:"— មិនប្តូរបន្ទប់ —",movedFrom:"ប្តូរមកពីបន្ទប់"});
+Object.assign(L.en,{capT:"Capacity by room type",capAd:"Max adults (people)",capKid:"Max children (people)",capHintP:"Adults = men + women (cannot exceed this). Children are counted separately and set per room type.",capMax:"Max",overKids:"More children than the room allows",moveRoom:"Move to another room (available rooms)",moveNone:"— Do not move —",movedFrom:"moved from room"});
 const WD={km:["ថ្ងៃអាទិត្យ","ថ្ងៃច័ន្ទ","ថ្ងៃអង្គារ","ថ្ងៃពុធ","ថ្ងៃព្រហស្បតិ៍","ថ្ងៃសុក្រ","ថ្ងៃសៅរ៍"],en:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]};
 const MO={km:["មករា","កុម្ភៈ","មីនា","មេសា","ឧសភា","មិថុនា","កក្កដា","សីហា","កញ្ញា","តុលា","វិច្ឆិកា","ធ្នូ"],en:["January","February","March","April","May","June","July","August","September","October","November","December"]};
 const ST={available:"var(--free)",occupied:"var(--busy)",cleaning:"var(--clean)",maintenance:"var(--fix)"};
 const KEY="gh-rooms-v3",HKEY="gh-hist-v3",PKEY="gh-prices-v2",LKEY="gh-lang";
-const DEF={"2-ac":15,"2-fan":7.5,"1-ac":10,"1-fan":5,"h-2-ac":7.5,"h-2-fan":7.5,"h-1-ac":7.5,"h-1-fan":7.5,"hh":3};
+const DEF={"2-ac":15,"2-fan":7.5,"1-ac":10,"1-fan":5,"h-2-ac":7.5,"h-2-fan":7.5,"h-1-ac":7.5,"h-1-fan":7.5,"hh":3,"cap-2":4,"cap-1":2,"kid-2":2,"kid-1":1};
 let lang="km",prices={...DEF},rooms=[],hist=[],filter="all",editing=null;
 let viewOnly=false;try{viewOnly=localStorage.getItem("gh-view")=="1"}catch(e){}
 try{lang=localStorage.getItem(LKEY)||"km"}catch(e){}
@@ -345,6 +355,8 @@ const ymd=d=>d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate());
 const pd=u=>{const[a,b,c]=u.split("-");return new Date(+a,b-1,+c)};
 const rate=r=>+prices[r.beds+"-"+r.cool]||0;
 const hh=()=>+prices.hh||3;
+const capFor=b=>Math.max(1,+prices["cap-"+b]||4),kidFor=b=>Math.max(0,+prices["kid-"+b]||0);
+const capVal=b=>`${capFor(b)} ${t("ppl")}`+(kidFor(b)?` + ${t("kids")} ${kidFor(b)}`:"");
 const hrate=r=>+prices["h-"+r.beds+"-"+r.cool]||0;
 const nights=r=>{if(!r.ci||!r.co)return 0;const d=Math.round((pd(r.co)-pd(r.ci))/864e5);return d>0?d:0};
 const nightsB=r=>{if(!r.ci)return 0;const n=new Date(),end=r.co?pd(r.co):new Date(n.getFullYear(),n.getMonth(),n.getDate());return Math.max(1,Math.round((end-pd(r.ci))/864e5))};
@@ -395,7 +407,7 @@ function tile(r){
   else if(r.status=="cleaning")btn=`<button class="btn main" data-a="ready" data-id="${r.id}">${t("markReady")}</button>`;
   const gd=gdesc(r);
   return `<div class="room" style="--c:${ST[r.status]}"><div class="top"><span class="num">${t("room")} ${esc(r.n)}</span><span class="st">${t("st_"+r.status)}</span></div>
-  <span class="type">${t("cap")} ${r.cap} ${t("ppl")} · ${r.cool=="ac"?t("ac"):t("fan")}</span>
+  <span class="type">${t("cap")} ${capVal(r.beds)} · ${r.cool=="ac"?t("ac"):t("fan")}</span>
   ${occ?payLine(r):""}
   ${occ?`<span class="guest">${esc(r.guest)||"—"} · ${r.people||0} ${t("ppl")}${gd?` (${esc(gd)})`:""}</span>
   ${hr?`<span class="tag">⏱ ${t("hrMode")} · ${r.hrs||hh()} ${t("hr")}</span>${end?`<div class="cd" data-end="${end}"></div><span class="type">${t("untilT")} ${hm(new Date(end))}</span>`:""}`:""}
@@ -436,7 +448,7 @@ $("lang").onclick=()=>{lang=lang=="km"?"en":"km";try{localStorage.setItem(LKEY,l
 let dEnd=null,prevMode="night",ppAuto=true,dMode="room",coAuto=false;
 const NIGHT_OUT="10:00";
 const nextDay=u=>{const d=pd(u);d.setDate(d.getDate()+1);return ymd(d)};
-const fillCnt=(id,v)=>{const mx=Math.max(4,+v||0);$(id).innerHTML=Array.from({length:mx+1},(_,i)=>`<option value="${i}">${i}</option>`).join("");$(id).value=+v||0};
+const fillCnt=(id,v,cap)=>{const mx=Math.max(cap||0,+v||0);$(id).innerHTML=Array.from({length:mx+1},(_,i)=>`<option value="${i}">${i}</option>`).join("");$(id).value=+v||0};
 function openDlg(id,inNow,mode,dm){
   dm=dm||(inNow?"stay":"room");dMode=dm;editing=id;const now=new Date();dEnd=null;coAuto=false;
   const r={...(rooms.find(x=>x.id==id)||{n:"",beds:1,cap:2,cool:"fan",status:"available",guest:"",people:0,ci:"",cit:"",co:"",cot:"",notes:""})};
@@ -449,12 +461,14 @@ function openDlg(id,inNow,mode,dm){
   }else if(r.mode=="hour")dEnd=+r.endAt||null;
   $("dt").textContent=id?`${t("room")} ${r.n}`:t("newRoom");
   [["n","n"],["b","beds"],["cp","cap"],["c","cool"],["s","status"],["g","guest"],["ci","ci"],["cit","cit"],["co","co"],["cot","cot"],["no","notes"],["md","mode"],["hrs","hrs"],["am","amt"],["pt","pt"],["pm","pm"],["pp","paid"]].forEach(([i,k])=>$(i).value=r[k]??"");
-  fillCnt("m",r.m);fillCnt("w",r.w);fillCnt("k",r.c);
+  fillCnt("m",r.m,capFor(r.beds));fillCnt("w",r.w,capFor(r.beds));fillCnt("k",r.c,kidFor(r.beds));
   $("hrsW").style.display=r.mode=="hour"?"":"none";prevMode=r.mode;
   const sr=rooms.find(x=>x.id==id);$("outNow").style.display=sr&&sr.status=="occupied"?"":"none";$("delRm").style.display=sr&&dm=="room"?"":"none";
   const rm=dm=="room",occR=!!sr&&sr.status=="occupied";
   $("gRoom").style.display=rm?"":"none";$("gStay").style.display=rm?"none":"";$("mdW").style.display=rm?"none":"";$("stW").style.display=rm&&occR?"none":"";
   [...$("s").options].forEach(o=>{o.disabled=rm&&o.value=="occupied"&&!occR});
+  const mvOn=dm=="stay"&&!!sr&&sr.status=="occupied";$("mvW").style.display=mvOn?"":"none";
+  $("mv").innerHTML=`<option value="">${t("moveNone")}</option>`+(mvOn?rooms.filter(x=>x.id!=sr.id&&x.status=="available").sort(byNum).map(x=>`<option value="${x.id}">${t("room")} ${esc(x.n)} · ${x.beds==2?t("b2"):t("b1")} · ${x.cool=="ac"?t("ac"):t("fan")}</option>`).join(""):"");$("mv").value="";
   est();tick();$("dlg").showModal();
 }
 const cur=()=>({beds:+$("b").value,cool:$("c").value,ci:$("ci").value,co:$("co").value,mode:$("md").value,hrs:+$("hrs").value||hh(),amt:$("am").value,status:"occupied"});
@@ -467,10 +481,11 @@ function est(){
   payUi(f);chk();
 }
 function payUi(f){const pin=$("pt").value=="in";$("pmW").style.display=$("ppW").style.display=pin?"":"none";$("qrRow").style.display=pin&&$("pm").value=="aba"?"":"none";if(pin&&ppAuto)$("pp").value=f}
-function chk(){const g=gt();
-  if(dMode=="room"){const sr=rooms.find(x=>x.id==editing),pp=sr&&sr.status=="occupied"?(+sr.people||0):0;$("m").setCustomValidity("");$("cp").setCustomValidity(pp>(+$("cp").value||0)?t("over"):"")}
-  else{$("cp").setCustomValidity("");$("m").setCustomValidity(g>(+$("cp").value||0)?t("over"):($("s").value=="occupied"&&!g)?t("needG"):"")}
-  $("ptot").textContent=`${t("guestsL")}: ${g} ${t("ppl")}`}
+function chk(){const g=gt(),b=+$("b").value||1,ad=(+$("m").value||0)+(+$("w").value||0),kd=+$("k").value||0;
+  $("cp").setCustomValidity("");
+  if(dMode=="room"){const sr=rooms.find(x=>x.id==editing),oc=sr&&sr.status=="occupied",sa=oc?((+sr.m||0)+(+sr.w||0)||+sr.people||0):0,sk=oc?(+sr.c||0):0;$("m").setCustomValidity("");$("k").setCustomValidity("");$("b").setCustomValidity(sa>capFor(b)?t("over"):sk>kidFor(b)?t("overKids"):"")}
+  else{$("b").setCustomValidity("");$("m").setCustomValidity(ad>capFor(b)?t("over"):($("s").value=="occupied"&&!g)?t("needG"):"");$("k").setCustomValidity(kd>kidFor(b)?t("overKids"):"")}
+  $("ptot").textContent=`${t("guestsL")}: ${g} ${t("ppl")} · ${t("capMax")}: ${capVal(b)}`}
 function autoEnd(){
   if($("md").value=="night"){const ci=$("ci").value;if(coAuto&&ci){$("co").value=nextDay(ci);$("cot").value=NIGHT_OUT}return}
   if($("md").value!="hour")return;const ci=$("ci").value,ct=$("cit").value;if(!ci||!ct)return;
@@ -483,6 +498,7 @@ $("md").addEventListener("input",()=>{const h=$("md").value=="hour";$("hrsW").st
 $("pp").addEventListener("input",()=>{ppAuto=false});
 $("pt").addEventListener("input",()=>{if($("pt").value=="in"&&!$("pp").value)ppAuto=true});
 ["b","c","ci","cit","co","cot","m","w","k","cp","s","md","hrs","am","pt","pm","pp"].forEach(i=>$(i).addEventListener("input",est));
+$("mv").addEventListener("input",()=>{const sr=rooms.find(x=>x.id==editing),mt=rooms.find(x=>x.id==$("mv").value),tg=mt||sr;if(!tg)return;$("b").value=tg.beds;if(mt)$("c").value=mt.cool;const m=$("m").value,w=$("w").value,k=$("k").value;fillCnt("m",m,capFor(tg.beds));fillCnt("w",w,capFor(tg.beds));fillCnt("k",k,kidFor(tg.beds));est()});
 $("cinNow").onclick=()=>{
   const d=new Date();$("s").value="occupied";$("ci").value=ymd(d);$("cit").value=hm(d);dEnd=null;
   if($("md").value=="hour"){const e=new Date(d.getTime()+(+$("hrs").value||hh())*36e5);$("co").value=ymd(e);$("cot").value=hm(e);dEnd=e.getTime()}
@@ -555,6 +571,8 @@ $("f").onsubmit=()=>{
   d.endAt=hr&&d.status=="occupied"?(dEnd||(d.co&&d.cot?new Date(d.co+"T"+d.cot).getTime():null)):null;
   const old=rooms.find(x=>x.id==editing),now=new Date();
   if(old&&old.status=="occupied"&&d.status!="occupied")logStay({...old,notes:d.notes,amt:d.amt,co:d.co||old.co||ymd(now),cot:d.cot||old.cot||hm(now)});
+  const tg=$("mv").value?rooms.find(x=>x.id==$("mv").value&&x.status=="available"):null;
+  if(tg&&old&&old.status=="occupied"&&d.status=="occupied"){const fr=old.n;Object.assign(d,{n:tg.n,beds:tg.beds,cool:tg.cool,cap:tg.cap});d.notes=(d.notes?d.notes+" · ":"")+t("movedFrom")+" "+fr;Object.assign(tg,d);Object.assign(old,clear,{status:"cleaning",notes:""});rooms.sort(byNum);save();render();toast(`✓ ${t("room")} ${fr} → ${t("room")} ${tg.n}`);return}
   if(d.status!="occupied")Object.assign(d,clear);
   if(old)Object.assign(old,d);else rooms.push({id:"r"+Date.now(),...d});
   rooms.sort(byNum);save();render();
@@ -612,7 +630,7 @@ let viewing=null;
 function openView(id){
   const r=rooms.find(x=>x.id==id);if(!r)return;viewing=id;
   const occ=r.status=="occupied",hr=r.mode=="hour",end=endMs(r),row=(k,v)=>`<tr><th>${esc(k)}</th><td>${v}</td></tr>`;
-  let h=row(t("room"),esc(r.n))+row(t("status"),t("st_"+r.status))+row(t("hBeds"),r.beds)+row(t("cool"),r.cool=="ac"?t("ac"):t("fan"))+row(t("capL"),r.cap)
+  let h=row(t("room"),esc(r.n))+row(t("status"),t("st_"+r.status))+row(t("hBeds"),r.beds)+row(t("cool"),r.cool=="ac"?t("ac"):t("fan"))+row(t("capL"),esc(capVal(r.beds)))
     +row(t("billStd"),`${money(rate(r))} / ${t("night")} · ${money(hrate(r))} / ${hh()} ${t("hr")}`);
   if(occ){
     const gd=gdesc(r);
