@@ -100,10 +100,23 @@ input,select,textarea{display:block;width:100%;margin-top:3px;font:inherit;color
 #adlg.alert{border-color:var(--clean)}
 .bg{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-top:14px}
 .bc{border:1px solid var(--fix);border-radius:10px;background:var(--bg);overflow:hidden;display:flex;flex-direction:column}
-.bc img,.bc .noph{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;background:var(--line)}
+.bc img,.bc .noph{width:100%;aspect-ratio:1/1;object-fit:cover;object-position:top;display:block;background:var(--line)}
 .bc .noph{display:flex;align-items:center;justify-content:center;font-size:2.4rem}
 .bi{padding:8px 10px;display:flex;flex-direction:column;gap:2px;flex:1;word-break:break-word}
 .bc .bandel{margin:0 10px 10px;align-self:flex-start}
+.bc{cursor:pointer}
+.pw{position:relative}
+.cnt{position:absolute;right:6px;bottom:6px;background:rgba(0,0,0,.65);color:#fff;border-radius:999px;padding:0 8px;font-size:.78rem}
+.thumbs{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.th{position:relative;width:56px;height:56px;padding:0;border:2px solid var(--line);border-radius:8px;overflow:hidden;background:var(--bg)}
+.th.on{border-color:var(--accent)}
+.th img{width:100%;height:100%;object-fit:cover;display:block}
+span.th button{position:absolute;top:0;right:0;width:22px;height:22px;border:0;background:rgba(0,0,0,.7);color:#fff;font-size:.7rem;line-height:1;padding:0}
+.viewer{position:relative;background:#000;border-radius:10px;min-height:200px;display:flex;align-items:center;justify-content:center;overflow:hidden;touch-action:pan-y}
+.viewer img{max-width:100%;max-height:58vh;object-fit:contain;display:block}
+.viewer .noph{font-size:3rem;padding:50px}
+.viewer .nv{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;border:0;background:rgba(0,0,0,.55);color:#fff;font-size:1.6rem;line-height:1}
+.viewer .pv{left:8px}.viewer .nx{right:8px}
 @keyframes pulse{50%{opacity:.35}}
 @media (prefers-reduced-motion:reduce){.cd.up{animation:none}}
 .tag{align-self:flex-start;font-size:.8rem;font-weight:600;border:1px solid var(--busy);color:var(--busy);border-radius:999px;padding:0 10px}
@@ -134,7 +147,7 @@ dialog.alert{border:3px solid var(--fix)}
 .ptab input{margin:0;border:0;border-radius:0;background:transparent;text-align:center;font-weight:700;font-size:1.05rem;padding:12px 4px;min-width:64px;-moz-appearance:textfield}
 .ptab input::-webkit-outer-spin-button,.ptab input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
 .ptab td:focus-within{background:var(--bg);outline:2px solid var(--accent);outline-offset:-2px}
-.vo #add,.vo #chg,.vo #qrFile,.vo #qrDel,.vo #clrH,.vo #vbill,.vo #vedit,.vo [data-i18n="qrUp"],.vo #alist .btn,.vo #banForm,.vo .bandel{display:none!important}
+.vo #add,.vo #chg,.vo #qrFile,.vo #qrDel,.vo #clrH,.vo #vbill,.vo #vedit,.vo [data-i18n="qrUp"],.vo #alist .btn,.vo #banForm,.vo .bandel,.vo .bdedit{display:none!important}
 .ptab input:disabled{opacity:1;color:var(--ink);-webkit-text-fill-color:var(--ink)}
 </style>
 </head>
@@ -251,13 +264,34 @@ dialog.alert{border:3px solid var(--fix)}
     <form id="banForm" autocomplete="off" style="margin-top:12px">
       <div class="row">
         <label><span data-i18n="banName"></span><input id="banName" maxlength="80"></label>
-        <label><span data-i18n="banPhoto"></span><input id="banFile" type="file" accept="image/*"></label>
+        <label><span data-i18n="banPhoto"></span><input id="banFile" type="file" accept="image/*" multiple></label>
       </div>
       <label><span data-i18n="banWhy"></span><textarea id="banWhy" rows="2" maxlength="300"></textarea></label>
-      <div class="nowrow"><img id="banPrev" alt="" style="width:64px;height:64px;object-fit:cover;border-radius:8px;display:none"><button type="submit" class="btn" data-i18n="banSave"></button></div>
+      <div class="nowrow"><div id="banPrev" class="thumbs" style="margin:0"></div><button type="submit" class="btn" data-i18n="banSave"></button></div>
       <div class="est" id="banErr" style="color:var(--fix)"></div>
     </form>
     <div class="bg" id="banlist"></div>
+  </div>
+</dialog>
+<dialog id="bddlg" class="wide">
+  <div class="dh"><h2 id="bdT"></h2><button type="button" class="x" id="bdX">✕</button></div>
+  <div class="db">
+    <div class="viewer" id="bdView"></div>
+    <div class="thumbs" id="bdThumbs"></div>
+    <div class="nowrow bdedit">
+      <input type="file" id="bdFile" accept="image/*" multiple style="display:none">
+      <button type="button" class="btn ghost sm" id="bdAdd" data-i18n="bdAdd"></button>
+      <button type="button" class="btn ghost sm" id="bdFirst" data-i18n="bdFirst"></button>
+      <button type="button" class="btn danger sm" id="bdRm" data-i18n="bdRm"></button>
+    </div>
+    <label><span data-i18n="banName"></span><input id="bdName" maxlength="80"></label>
+    <label><span data-i18n="banWhy"></span><textarea id="bdWhy" rows="2" maxlength="300"></textarea></label>
+    <div class="est" id="bdErr" style="color:var(--fix)"></div>
+    <div class="actions">
+      <button type="button" class="btn ghost bdedit" id="bdDel" data-i18n="bdDel" style="margin-right:auto;color:#c0392b"></button>
+      <button type="button" class="btn ghost" id="bdCl" data-i18n="close"></button>
+      <button type="button" class="btn bdedit" id="bdSave" data-i18n="save"></button>
+    </div>
   </div>
 </dialog>
 <dialog id="lock">
@@ -336,8 +370,8 @@ amtL:"Total charged ($) — empty = standard price",sumL:"Total",billStd:"Standa
 hType:"Type",hAmt:"Amount ($)",hRev:"Revenue ($)",hHours:"Hours",hCool:"AC / Fan",sToday:"Revenue today",sAll:"Total revenue",payT:"Payment",editStay:"Edit stay",pRoom:"Room type",pNight:"Per night ($)",pHour:"Hourly rest ($ per session)",calT:"Calendar",todayB:"Today",sIn:"Check-in",sOut:"Check-out",sStay:"Staying",search:"Search room number or guest name",stayCnt:"stays",monthRev:"Revenue this month",dayEmpty:"No guests on this day.",pickDay:"Tap a day to see its guests",paidVia:"Paid via",payWhen:"When to pay",payIn:"Paid",payOutT:"Not yet paid",payMeth:"Payment method",cash:"Cash",aba:"ABA (scan QR)",prepL:"Paid in advance ($)",prepD:"Prepaid",balD:"Balance",dueNow:"Collect from guest",refundD:"Refund to guest",payDone:"Fully paid",showQr:"Show ABA QR",qrT:"Scan to pay with ABA",qrNone:"No QR image yet. Upload your ABA QR in the \"Prices per night\" section on the main page.",qrUp:"Guest house ABA QR image (for guests to scan)",qrDel:"Remove QR",qrSaved:"QR image saved",hPrepA:"Prepaid ($)",hPrepM:"Prepaid method",hBalA:"Paid at check-out ($)",hBalM:"Check-out method",hCash:"Cash ($)",hAba:"ABA ($)",rcvCashT:"Cash received today",rcvAbaT:"ABA received today",rcvCashA:"Cash received total",rcvAbaA:"ABA received total"}};
 Object.assign(L.km,{capT:"ចំណុះមនុស្ស តាមប្រភេទបន្ទប់",capAd:"មនុស្សធំអតិបរមា (នាក់)",capKid:"ក្មេងអតិបរមា (នាក់)",capHintP:"មនុស្សធំ = ប្រុស + ស្រី (មិនអាចលើសចំនួននេះទេ)។ ក្មេងគិតដោយឡែក ហើយកំណត់ចំនួនបានតាមប្រភេទបន្ទប់។",capMax:"អតិបរមា",overKids:"ចំនួនក្មេងលើសកំណត់របស់បន្ទប់",moveRoom:"ប្តូរទៅបន្ទប់ផ្សេង (បន្ទប់ទំនេរ)",moveNone:"— មិនប្តូរបន្ទប់ —",movedFrom:"ប្តូរមកពីបន្ទប់"});
 Object.assign(L.en,{capT:"Capacity by room type",capAd:"Max adults (people)",capKid:"Max children (people)",capHintP:"Adults = men + women (cannot exceed this). Children are counted separately and set per room type.",capMax:"Max",overKids:"More children than the room allows",moveRoom:"Move to another room (available rooms)",moveNone:"— Do not move —",movedFrom:"moved from room"});
-Object.assign(L.km,{ban:"បញ្ជីហាមឃាត់",banT:"បញ្ជីមនុស្សហាមឃាត់",banHint:"មនុស្សក្នុងបញ្ជីនេះ មិនត្រូវទទួលឲ្យស្នាក់នៅទៀតទេ។ ដាក់រូបថត ឈ្មោះ និងមូលហេតុ ដើម្បីឲ្យបុគ្គលិកទាំងអស់ស្គាល់។",banName:"ឈ្មោះ",banPhoto:"រូបថត",banWhy:"មូលហេតុ / កំណត់ចំណាំ",banSave:"បន្ថែមចូលបញ្ជី",banNone:"មិនទាន់មាននរណាម្នាក់ក្នុងបញ្ជីហាមឃាត់ទេ។",banDate:"កត់ត្រាថ្ងៃ",banNeed:"សូមបញ្ចូលរូបថត ឬឈ្មោះ",banMax:"បញ្ជីពេញហើយ (អតិបរមា 30 នាក់)។ សូមលុបអ្នកចាស់ៗចេញ។",banDelQ:"លុបមនុស្សនេះចេញពីបញ្ជីហាមឃាត់?"});
-Object.assign(L.en,{ban:"Banned list",banT:"Banned people",banHint:"People on this list must not be given a room again. Add a photo, name and reason so all staff can recognise them.",banName:"Name",banPhoto:"Photo",banWhy:"Reason / notes",banSave:"Add to list",banNone:"Nobody on the banned list yet.",banDate:"Added",banNeed:"Please add a photo or a name",banMax:"List is full (max 30 people). Remove old entries first.",banDelQ:"Remove this person from the banned list?"});
+Object.assign(L.km,{ban:"បញ្ជីហាមឃាត់",banT:"បញ្ជីមនុស្សហាមឃាត់",banHint:"មនុស្សក្នុងបញ្ជីនេះ មិនត្រូវទទួលឲ្យស្នាក់នៅទៀតទេ។ ដាក់រូបថត ឈ្មោះ និងមូលហេតុ ដើម្បីឲ្យបុគ្គលិកទាំងអស់ស្គាល់។",banName:"ឈ្មោះ",banPhoto:"រូបថត (ជ្រើសបានច្រើន)",banWhy:"មូលហេតុ / កំណត់ចំណាំ",banSave:"បន្ថែមចូលបញ្ជី",banNone:"មិនទាន់មាននរណាម្នាក់ក្នុងបញ្ជីហាមឃាត់ទេ។",banDate:"កត់ត្រាថ្ងៃ",banNeed:"សូមបញ្ចូលរូបថត ឬឈ្មោះ",banMax:"បញ្ជីពេញហើយ (អតិបរមា 30 នាក់)។ សូមលុបអ្នកចាស់ៗចេញ។",banDelQ:"លុបមនុស្សនេះចេញពីបញ្ជីហាមឃាត់?",bdAdd:"＋ បន្ថែមរូប",bdFirst:"ដាក់ជារូបមុខ",bdRm:"លុបរូបនេះ",bdDel:"លុបមនុស្សនេះ",banMaxP:"រូបពេញហើយ (អតិបរមា 6 រូបក្នុងម្នាក់)",banBig:"ទំហំរូបក្នុងបញ្ជីពេញហើយ។ សូមលុបរូបចាស់ៗខ្លះចេញ ទើបបន្ថែមបាន។"});
+Object.assign(L.en,{ban:"Banned list",banT:"Banned people",banHint:"People on this list must not be given a room again. Add a photo, name and reason so all staff can recognise them.",banName:"Name",banPhoto:"Photos (select several)",banWhy:"Reason / notes",banSave:"Add to list",banNone:"Nobody on the banned list yet.",banDate:"Added",banNeed:"Please add a photo or a name",banMax:"List is full (max 30 people). Remove old entries first.",banDelQ:"Remove this person from the banned list?",bdAdd:"＋ Add photo",bdFirst:"Make cover photo",bdRm:"Remove this photo",bdDel:"Remove person",banMaxP:"Photo limit reached (max 6 per person)",banBig:"The banned list has used up its photo space. Remove some old photos first."});
 const WD={km:["ថ្ងៃអាទិត្យ","ថ្ងៃច័ន្ទ","ថ្ងៃអង្គារ","ថ្ងៃពុធ","ថ្ងៃព្រហស្បតិ៍","ថ្ងៃសុក្រ","ថ្ងៃសៅរ៍"],en:["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"]};
 const MO={km:["មករា","កុម្ភៈ","មីនា","មេសា","ឧសភា","មិថុនា","កក្កដា","សីហា","កញ្ញា","តុលា","វិច្ឆិកា","ធ្នូ"],en:["January","February","March","April","May","June","July","August","September","October","November","December"]};
 const ST={available:"var(--free)",occupied:"var(--busy)",cleaning:"var(--clean)",maintenance:"var(--fix)"};
@@ -683,32 +717,75 @@ $("vedit").onclick=()=>{$("vdlg").close();const r=rooms.find(x=>x.id==viewing);o
 $("vbill").onclick=()=>{const r=rooms.find(x=>x.id==viewing);if(r){$("vdlg").close();openBill(r)}};
 
 // ---- banned list (photos stored in the shared prices record) ----
-const BAN_MAX=30,okImg=s=>typeof s=="string"&&s.startsWith("data:image/");
+const BAN_MAX=30,BAN_PH=6,okImg=s=>typeof s=="string"&&s.startsWith("data:image/");
 const banList=()=>Array.isArray(prices.ban)?prices.ban:[];
-let banPhoto="";
+const bph=b=>Array.isArray(b.photos)?b.photos.filter(okImg):(okImg(b.photo)?[b.photo]:[]);
+let banPhotos=[],bd=null,bdI=0;
 function banBtn(){const n=banList().length;$("banBtn").textContent="🚫 "+t("ban")+(n?" ("+n+")":"")}
 function shrink(f,max,q,ok,bad){const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.max(1,Math.round(im.width*k));c.height=Math.max(1,Math.round(im.height*k));const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);ok(c.toDataURL("image/jpeg",q))};im.onerror=bad;im.src=fr.result};fr.onerror=bad;fr.readAsDataURL(f)}
+const BAN_BYTES=4e6,plen=a=>a.reduce((x,p)=>x+p.length,0);
+const banUsed=ex=>banList().reduce((x,b)=>x+(b.id==ex?0:plen(bph(b))),0);
+function addPhotos(files,arr,after,ex){
+  const fs=[...files].slice(0,Math.max(0,BAN_PH-arr.length));let i=0;
+  (function nx(){if(i>=fs.length){after();return}shrink(fs[i++],900,.82,d=>{if(banUsed(ex)+plen(arr)+d.length>BAN_BYTES){alert(t("banBig"));after();return}arr.push(d);nx()},()=>{alert(t("saveFail"));nx()})})();
+}
 function renderBan(){
   const a=banList();
-  $("banlist").innerHTML=a.length?a.map(b=>`<div class="bc">${okImg(b.photo)?`<img src="${esc(b.photo)}" alt="${esc(b.name)}">`:`<div class="noph">🚫</div>`}<div class="bi"><b>${esc(b.name)||"—"}</b>${b.why?`<span class="type">${esc(b.why)}</span>`:""}<span class="type">${t("banDate")}: ${esc(fy(b.d))}</span></div><button type="button" class="btn danger sm bandel" data-bd="${esc(b.id)}">${t("del")}</button></div>`).join(""):`<div class="empty">${t("banNone")}</div>`;
+  $("banlist").innerHTML=a.length?a.map(b=>{const ph=bph(b);return `<div class="bc" data-bo="${esc(b.id)}" role="button" tabindex="0">${ph.length?`<div class="pw"><img src="${esc(ph[0])}" alt="${esc(b.name)}">${ph.length>1?`<span class="cnt">🖼 ${ph.length}</span>`:""}</div>`:`<div class="noph">🚫</div>`}<div class="bi"><b>${esc(b.name)||"—"}</b>${b.why?`<span class="type">${esc(b.why)}</span>`:""}<span class="type">${t("banDate")}: ${esc(fy(b.d))}</span></div></div>`}).join(""):`<div class="empty">${t("banNone")}</div>`;
 }
+function renderPrev(){$("banPrev").innerHTML=banPhotos.map((p,i)=>`<span class="th"><img src="${esc(p)}" alt=""><button type="button" data-rp="${i}" aria-label="remove">✕</button></span>`).join("")}
 $("banBtn").onclick=()=>{$("banErr").textContent="";renderBan();$("bandlg").showModal()};
 $("banX").onclick=()=>$("bandlg").close();
 $("bandlg").addEventListener("click",e=>{if(e.target==$("bandlg"))$("bandlg").close()});
-$("banFile").onchange=e=>{const f=e.target.files[0];if(!f)return;shrink(f,256,.68,d=>{banPhoto=d;const p=$("banPrev");p.src=d;p.style.display="";$("banErr").textContent=""},()=>alert(t("saveFail")))};
+$("banFile").onchange=e=>{const fl=e.target.files;if(!fl.length)return;$("banErr").textContent=fl.length>BAN_PH-banPhotos.length?t("banMaxP"):"";addPhotos(fl,banPhotos,renderPrev,null);e.target.value=""};
+$("banPrev").onclick=e=>{const b=e.target.closest("[data-rp]");if(b){banPhotos.splice(+b.dataset.rp,1);renderPrev()}};
 $("banForm").onsubmit=e=>{
   e.preventDefault();if(viewOnly)return;
   const n=$("banName").value.trim(),w=$("banWhy").value.trim();
-  if(!n&&!banPhoto){$("banErr").textContent=t("banNeed");return}
+  if(!n&&!banPhotos.length){$("banErr").textContent=t("banNeed");return}
   if(banList().length>=BAN_MAX){$("banErr").textContent=t("banMax");return}
-  prices.ban=[{id:"b"+Date.now(),name:n,why:w,photo:banPhoto,d:ymd(new Date())},...banList()];
-  banPhoto="";$("banForm").reset();$("banErr").textContent="";const p=$("banPrev");p.style.display="none";p.removeAttribute("src");
+  prices.ban=[{id:"b"+Date.now(),name:n,why:w,photos:banPhotos.slice(),d:ymd(new Date())},...banList()];
+  banPhotos=[];$("banForm").reset();$("banErr").textContent="";renderPrev();
   save();renderBan();banBtn();
 };
-$("banlist").onclick=e=>{
-  const b=e.target.closest("[data-bd]");if(!b||viewOnly)return;
-  const id=b.dataset.bd,x=banList().find(y=>y.id==id);if(!x)return;
-  askConfirm(`${t("banDelQ")}\n${x.name||"—"}`,()=>{prices.ban=banList().filter(y=>y.id!=id);save();renderBan();banBtn()});
+// open detail
+function openBd(id){
+  const b=banList().find(x=>x.id==id);if(!b)return;
+  bd={id,photos:bph(b).slice()};bdI=0;
+  $("bdName").value=b.name||"";$("bdWhy").value=b.why||"";$("bdName").readOnly=$("bdWhy").readOnly=viewOnly;
+  $("bdT").textContent=b.name||t("banT");$("bdErr").textContent="";renderBd();$("bddlg").showModal();
+}
+function renderBd(){
+  const n=bd.photos.length;if(bdI>=n)bdI=Math.max(0,n-1);
+  $("bdView").innerHTML=n?`<img src="${esc(bd.photos[bdI])}" alt="">${n>1?`<button type="button" class="nv pv" data-nv="-1" aria-label="prev">‹</button><button type="button" class="nv nx" data-nv="1" aria-label="next">›</button>`:""}<span class="cnt">${bdI+1} / ${n}</span>`:`<div class="noph">🚫</div>`;
+  $("bdThumbs").innerHTML=bd.photos.map((p,i)=>`<button type="button" class="th${i==bdI?" on":""}" data-ti="${i}"><img src="${esc(p)}" alt=""></button>`).join("");
+  $("bdFirst").style.display=bdI>0?"":"none";$("bdRm").disabled=!n;$("bdAdd").disabled=n>=BAN_PH;
+}
+function navBd(d){const n=bd.photos.length;if(n<2)return;bdI=(bdI+d+n)%n;renderBd()}
+$("banlist").onclick=e=>{const c=e.target.closest("[data-bo]");if(c)openBd(c.dataset.bo)};
+$("banlist").addEventListener("keydown",e=>{if(e.key!="Enter"&&e.key!=" ")return;const c=e.target.closest("[data-bo]");if(c){e.preventDefault();openBd(c.dataset.bo)}});
+$("bdView").onclick=e=>{const b=e.target.closest("[data-nv]");if(b)navBd(+b.dataset.nv)};
+$("bdThumbs").onclick=e=>{const b=e.target.closest("[data-ti]");if(b){bdI=+b.dataset.ti;renderBd()}};
+let bdX0=null;
+$("bdView").addEventListener("touchstart",e=>{bdX0=e.touches[0].clientX},{passive:true});
+$("bdView").addEventListener("touchend",e=>{if(bdX0==null)return;const dx=e.changedTouches[0].clientX-bdX0;bdX0=null;if(Math.abs(dx)>40)navBd(dx<0?1:-1)});
+$("bddlg").addEventListener("keydown",e=>{if(e.target.matches("input,textarea"))return;if(e.key=="ArrowLeft")navBd(-1);else if(e.key=="ArrowRight")navBd(1)});
+$("bdAdd").onclick=()=>$("bdFile").click();
+$("bdFile").onchange=e=>{const fl=e.target.files;if(!fl.length||viewOnly)return;$("bdErr").textContent=fl.length>BAN_PH-bd.photos.length?t("banMaxP"):"";addPhotos(fl,bd.photos,()=>{bdI=bd.photos.length-1;renderBd()},bd.id);e.target.value=""};
+$("bdRm").onclick=()=>{if(viewOnly||!bd.photos.length)return;bd.photos.splice(bdI,1);renderBd()};
+$("bdFirst").onclick=()=>{if(viewOnly||bdI<1)return;const[p]=bd.photos.splice(bdI,1);bd.photos.unshift(p);bdI=0;renderBd()};
+$("bdX").onclick=$("bdCl").onclick=()=>$("bddlg").close();
+$("bdSave").onclick=()=>{
+  if(viewOnly)return;
+  const n=$("bdName").value.trim(),w=$("bdWhy").value.trim();
+  if(!n&&!bd.photos.length){$("bdErr").textContent=t("banNeed");return}
+  const b=banList().find(x=>x.id==bd.id);
+  if(b){b.name=n;b.why=w;b.photos=bd.photos.slice();delete b.photo;prices.ban=banList().slice();save()}
+  $("bddlg").close();renderBan();banBtn();
+};
+$("bdDel").onclick=()=>{
+  if(viewOnly)return;
+  askConfirm(`${t("banDelQ")}\n${$("bdName").value.trim()||"—"}`,()=>{prices.ban=banList().filter(x=>x.id!=bd.id);save();$("bddlg").close();renderBan();banBtn()});
 };
 
 // ---- time-up alert (hourly rest) ----
